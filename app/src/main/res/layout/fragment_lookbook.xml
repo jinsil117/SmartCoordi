@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/lookbook"
+    tools:context="com.pickth.dddd.smartcoordination.MainActivity">
+
+    <ImageView
+        android:id="@+id/iv_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    //갤러리 fab
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/albumfab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="15sp"
+        android:visibility="visible"
+        app:backgroundTint="#ffB6c1"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        android:src="@drawable/ic_add_black_24dp"/>
+
+</LinearLayout>

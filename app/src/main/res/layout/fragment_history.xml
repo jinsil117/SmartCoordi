@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".HistoryActivity"
+    >
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:mcv_arrowColor="?attr/colorPrimary"
+        app:mcv_tileHeight="80dp"
+        app:mcv_calendarMode="week"
+        app:mcv_dateTextAppearance="@style/CustomTextAppearance"
+        app:mcv_firstDayOfWeek="thursday"
+        app:mcv_headerTextAppearance="@style/CustomTextAppearance"
+        app:mcv_leftArrowMask="@drawable/ab"
+        app:mcv_monthLabels="@array/custom_months"
+        app:mcv_rightArrowMask="@drawable/af"
+        app:mcv_selectionColor="?attr/colorPrimary"
+        app:mcv_showOtherDates="all"
+        app:mcv_tileSize="60dp"
+        app:mcv_titleAnimationOrientation="vertical"
+        app:mcv_weekDayLabels="@array/custom_weekdays"
+        app:mcv_weekDayTextAppearance="@style/CustomTextAppearance"
+        />
+
+</LinearLayout>
