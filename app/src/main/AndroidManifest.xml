@@ -33,6 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ClothAddActivity"/>
+        <activity android:name=".HistoryActivity"/>
     </application>
 
 </manifest>

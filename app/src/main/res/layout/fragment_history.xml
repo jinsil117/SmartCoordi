@@ -4,29 +4,56 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".HistoryActivity"
-    >
-    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        android:id="@+id/calendarView"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+        <Button
+            android:id="@+id/before_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="저번달"/>
+        <TextView
+            android:id="@+id/tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World!"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/after_btn"
+            android:text="다음달"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/testbtn"/>
+    </LinearLayout>
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+        <TableRow>
+            <TextView android:text="일" android:layout_weight="1" android:textColor="#FF0000" android:textStyle="bold"/>
+            <TextView android:text="월" android:layout_weight="1" android:textStyle="bold"/>
+            <TextView android:text="화" android:layout_weight="1" android:textStyle="bold"/>
+            <TextView android:text="수" android:layout_weight="1" android:textStyle="bold"/>
+            <TextView android:text="목" android:layout_weight="1" android:textStyle="bold"/>
+            <TextView android:text="금" android:layout_weight="1" android:textStyle="bold"/>
+            <TextView android:text="토" android:layout_weight="1" android:textColor="#0054FF"/>
+        </TableRow>
+    </TableLayout>
+    <GridView
+        android:id="@+id/gv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:mcv_arrowColor="?attr/colorPrimary"
-        app:mcv_tileHeight="80dp"
-        app:mcv_calendarMode="week"
-        app:mcv_dateTextAppearance="@style/CustomTextAppearance"
-        app:mcv_firstDayOfWeek="thursday"
-        app:mcv_headerTextAppearance="@style/CustomTextAppearance"
-        app:mcv_leftArrowMask="@drawable/ab"
-        app:mcv_monthLabels="@array/custom_months"
-        app:mcv_rightArrowMask="@drawable/af"
-        app:mcv_selectionColor="?attr/colorPrimary"
-        app:mcv_showOtherDates="all"
-        app:mcv_tileSize="60dp"
-        app:mcv_titleAnimationOrientation="vertical"
-        app:mcv_weekDayLabels="@array/custom_weekdays"
-        app:mcv_weekDayTextAppearance="@style/CustomTextAppearance"
-        />
-
+        android:numColumns="7"
+        android:layout_marginTop="10dp">
+    </GridView>
 </LinearLayout>

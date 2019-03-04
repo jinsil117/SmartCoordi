@@ -1,31 +1,26 @@
 package com.pickth.dddd.smartcoordination;
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.Layout;
+import android.util.DisplayMetrics;
 import android.util.Log;
-
-import com.prolificinteractive.materialcalendarview.CalendarDay;
-import com.prolificinteractive.materialcalendarview.CalendarMode;
-import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
-import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,290 +29,152 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
 
-/**
- * Created by User on 2018-12-18.
- */
-
-public class HistoryActivity extends AppCompatActivity {
-
-    String time;
-    MaterialCalendarView materialCalendarView;
-    private final int CAMERA_CODE=1111;
-    private final int GALLERY_CODE=2222;
-    final String[] choice = new String []{"카메라","갤러리"}; //대화상자에 표시할 문구
-    private String currentPhotoPath;//실제 사진 파일 경로
-    String mImageCaptureName;//이미지 이름
-    final int REQ_CODE_SELECT_IMAGE=100;
+public class HistoryActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener
+{
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 1;
+    private String imageFilePath;
+    private String photoUri;
+    private Calendar curCar,mCal;
+    private TextView tv;
+    private Button beforeBTN, afterBTN, testbtn;
+    private GridView gv;
+    private ArrayList<DayInfo> DayList;
+    private CalendarAdapter adapter;
+    int Year, Month;
+    int width,height;
+    DisplayMetrics dm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        materialCalendarView = (MaterialCalendarView)findViewById(R.id.calendarView);
-        materialCalendarView.state().edit()
-                .setFirstDayOfWeek(Calendar.SUNDAY)
-                .setMinimumDate(CalendarDay.from(2017, 0, 1)) // 달력의 시작
-                .setMaximumDate(CalendarDay.from(2030, 11, 31)) // 달력의 끝
-                .setCalendarDisplayMode(CalendarMode.MONTHS)
-                .commit();
-        materialCalendarView.addDecorators( //달력을 꾸며주는 효과들
-                new SundayDecorator(),
-                new SaturdayDecorator()
-        );
+        setContentView(R.layout.fragment_history);
+        tv = (TextView)findViewById(R.id.tv); //year, month
+        beforeBTN = (Button)findViewById(R.id.before_btn); //last month
+        afterBTN = (Button)findViewById(R.id.after_btn); //next month
+        testbtn = (Button)findViewById(R.id.testbtn);
+        gv = (GridView)findViewById(R.id.gv);
 
-        String[] result = {"2017,03,18","2017,04,18","2017,05,18","2017,06,18"};
-        new ApiSimulator(result).executeOnExecutor(Executors.newSingleThreadExecutor());
+        beforeBTN.setOnClickListener(this);
+        afterBTN.setOnClickListener(this);
+        testbtn.setOnClickListener(this);
+        gv.setOnItemClickListener(this);
 
-        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() { //날짜 클릭 이벤트
-            @Override
-            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, final boolean selected) {
-                int Year = date.getYear();
-                int Month = date.getMonth() + 1;
-                int Day = date.getDay();
+        DayList = new ArrayList<DayInfo>();
 
-                Log.i("Year test", Year + "");
-                Log.i("Month test", Month + "");
-                Log.i("Day test", Day + "");
+        curCar = Calendar.getInstance();
+        Year = curCar.get(Calendar.YEAR);
+        Month = curCar.get(Calendar.MONTH);
 
-                String shot_Day = Year + "." + Month + "." + Day;
 
-                Log.i("shot_Day test", shot_Day + "");
-                materialCalendarView.clearSelection();
-                //대화상자
-                AlertDialog.Builder dlg = new AlertDialog.Builder(HistoryActivity.this);
-                dlg.setIcon(R.mipmap.ic_launcher);
-                dlg.setItems(choice, new DialogInterface.OnClickListener() { //사진 불러오는 방식
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(which==0){ //카메라
-                            int permissionCheck = ContextCompat.checkSelfPermission(HistoryActivity.this, Manifest.permission.CAMERA); //권한확인을 위한 변수
-                            if(permissionCheck== PackageManager.PERMISSION_DENIED){ // 권한 없음
-                                ActivityCompat.requestPermissions(HistoryActivity.this, new String[]{Manifest.permission.CAMERA},0); //카메라 실행
-                            }
-                            else{// 권한 있음
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(intent,1);
-                            }
-                        }else{ //갤러리 선택
-                            selectGallery(); //갤러리 실행
-                        }
-                    }
-                });
-                dlg.setNegativeButton("취소",null);
-                dlg.show();
-            }
-        });
-
-    }
-
-    private void selectGallery(){ //갤러리에 접근하도록 하는 함수
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(intent,GALLERY_CODE);
-    }
-
-    //해당 앱에서 사진을 찍으면 저장할 파일생성
-    private File createImageFile1() throws IOException {
-        File dir = new File(Environment.getExternalStorageDirectory() + "/path/");
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        mImageCaptureName = timeStamp + ".png";
-        File storageDir = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/path/"
-
-                + mImageCaptureName);
-        currentPhotoPath = storageDir.getAbsolutePath();
-
-        return storageDir;
-
+        dm = getApplicationContext().getResources().getDisplayMetrics();
+        width = dm.widthPixels; //get display width
+        height = dm.heightPixels; //get display height
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onResume() {
+        super.onResume();
+        mCal = Calendar.getInstance();
+        getCalendar();
+    }
 
-        if(requestCode == RESULT_OK){
-            switch (requestCode){
-                case CAMERA_CODE:
-                    String uri = sendPicture(data.getData()); //갤러리에서 가져오기기
-                    break;
+    //create calendar
+    private void getCalendar()
+    {
+        int firstDay;
+        int endDay;
 
-                case GALLERY_CODE:
-                    getPictureForPhoto(); //카메라에서 가져오기
-                    break;
+        DayList.clear();
+        mCal.set(Year,Month,1); //set this month
+        firstDay = mCal.get(Calendar.DAY_OF_WEEK); //get first day of this month
+        endDay = mCal.getActualMaximum(Calendar.DAY_OF_MONTH); //get end day of this month
 
-                default:
-                    break;
+        // 캘린더 타이틀(년월 표시)을 세팅한다.
+        tv.setText(mCal.get(Calendar.YEAR) + "년 "
+                + (mCal.get(Calendar.MONTH) + 1) + "월");
+
+        DayInfo day;
+
+        for(int i=0; i<firstDay-1; i++) //1일 전 까지는 공백으로 처리
+        {
+            day = new DayInfo();
+            day.setDay("");
+            DayList.add(day);
+        }
+        for(int i=1; i <= endDay; i++)
+        {
+            day = new DayInfo();
+            day.setDay(Integer.toString(i));
+            DayList.add(day);
+        }
+        initCalendarAdapter();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View v, int position, long arg3)
+    {
+        DayInfo dayInfo = DayList.get(position);
+        final List<String> ListItems = new ArrayList<>();
+        ListItems.add("사진촬영");
+        ListItems.add("갤러리");
+        ListItems.add("사진삭제");
+        final CharSequence[] items =  ListItems.toArray(new String[ ListItems.size()]);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(Year+"년 "+Month+1+"일 "+dayInfo.getDay()+"일");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int pos) {
+                String selectedText = items[pos].toString();
+                if(selectedText.equals("사진촬영")){
+                }
+                else if(selectedText.equals("갤러리")){
+                }
+                else {
+
+                }
             }
+        });
+        builder.show();
+    }
+
+    //클릭 메서드
+    public void onClick(View v)
+    {
+        switch(v.getId())
+        {
+            case R.id.before_btn:
+                if(Month == 0){
+                    Year -=1 ;
+                    Month = 11;
+                }
+                else Month --;
+                getCalendar();
+                break;
+            case R.id.after_btn:
+                if(Month == 11){
+                    Year +=1;
+                    Month = 0;
+                }
+                else Month ++;
+                getCalendar();
+                break;
+            case R.id.testbtn:
+                Toast.makeText(this,"안녕?",Toast.LENGTH_SHORT).show();
+
         }
     }
 
-    //카메라로 찍은 사진 적용
-    private void getPictureForPhoto() {
-        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(currentPhotoPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        int exifOrientation;
-        int exifDegree;
+    //사진촬영 https://developer.android.com/training/camera/photobasics#java
 
-        if (exif != null) {
-            exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-            exifDegree = exifOrientationToDegrees(exifOrientation);
-        } else {
-            exifDegree = 0;
-        }
-        //ivImage.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기
+    //갤러리
+
+
+    //어댑터 초기화 메서드
+    private void initCalendarAdapter()
+    {
+        adapter = new CalendarAdapter(this, R.layout.fragment_history_day, DayList,width,height);
+        gv.setAdapter(adapter);
     }
-
-
-    private String sendPicture(Uri imgUri){
-        String imagePath = getRealPathFromURI(imgUri); // path 경로
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(imagePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        int exifDegree = exifOrientationToDegrees(exifOrientation);
-
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);//경로를 통해 비트맵으로 전환
-        // ivImage.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기
-        return imagePath;
-
-    }
-
-    //사진의 회전값 가져오기
-    private int exifOrientationToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
-            return 90;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
-            return 180;
-        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
-            return 270;
-        }
-        return 0;
-    }
-
-    //사진을 정방향대로 회전하기
-    private Bitmap rotate(Bitmap src, float degree) {
-
-// Matrix 객체 생성
-        Matrix matrix = new Matrix();
-// 회전 각도 셋팅
-        matrix.postRotate(degree);
-// 이미지와 Matrix 를 셋팅해서 Bitmap 객체 생성
-        return Bitmap.createBitmap(src, 0, 0, src.getWidth(),
-                src.getHeight(), matrix, true);
-    }
-
-    //사진의 절대경로 구하기
-    private String getRealPathFromURI(Uri contentUri){
-        int column_index=0;
-        String [] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, proj, null,null,null);
-        if(cursor.moveToFirst()){
-            column_index=cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        }
-//        sqlDB = dbHelper.getWritableDatabase();
-//        sqlDB.execSQL("insert into gallery values ('"
-//                +shot_day +"',"
-//                +URI+");");
-//        sqlDB.close();
-        return cursor.getString(column_index);
-    }
-    //    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode){
-//            case  REQUEST_TAKE_PHOTO:
-//                if(requestCode == Activity.RESULT_OK){
-//                    try{
-//                        Log.i("REQUEST_TAKE_PHOTO","OK");
-//                        galleryAddPic();
-//
-//                       // iv_view.setImageURI(imageUrl);
-//                    }catch (Exception e){
-//                        Log.e("REQUEST_TAKE_PHOTO", e.toString());
-//                    }
-//                }else {
-//                    Toast.makeText(this, "사진찍기를 취소하였습니다.",Toast.LENGTH_SHORT).show();
-//                }
-//                break;
-//
-//            case REQUEST_TAKE_ALBUM:
-//                if(requestCode == Activity.RESULT_OK){
-//                    if(data.getData() != null){
-//                        try{
-//                            File albumFile=null;
-//                            albumFile = createImageFile();
-//                            photoURI = data.getData();
-//                            albumURI = Uri.fromFile(albumFile);
-//                            cropImage();
-//                        }catch (Exception e){
-//                        }
-//                    }
-//                }
-//                break;
-//
-//            case REQUEST_IMAGE_CROP:
-//                if(requestCode == Activity.RESULT_OK){
-//                    galleryAddPic();
-//                    //iv_view.setImageURI(imageUrl);
-//                }
-//                break;
-//        }
-//    }
-
-    private class ApiSimulator extends AsyncTask<Void, Void, List<CalendarDay>> {
-        String[] Time_Result;
-        ApiSimulator(String[] Time_Result){
-            this.Time_Result = Time_Result;
-        }
-        @Override
-        protected List<CalendarDay> doInBackground(@NonNull Void... voids) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            Calendar calendar = Calendar.getInstance();
-            ArrayList<CalendarDay> dates = new ArrayList<>();
-
-            /*특정날짜 달력에 점표시해주는곳*/
-            /*월은 0이 1월 년,일은 그대로*/
-            //string 문자열인 Time_Result 을 받아와서 ,를 기준으로짜르고 string을 int 로 변환
-            for(int i = 0 ; i < Time_Result.length ; i ++){
-                CalendarDay day = CalendarDay.from(calendar);
-                String[] time = Time_Result[i].split(",");
-                int year = Integer.parseInt(time[0]);
-                int month = Integer.parseInt(time[1]);
-                int dayy = Integer.parseInt(time[2]);
-
-                dates.add(day);
-                calendar.set(year,month-1,dayy);
-            }
-            return dates;
-        }
-
-        @Override
-        protected void onPostExecute(@NonNull List<CalendarDay> calendarDays) {
-            super.onPostExecute(calendarDays);
-
-            if (isFinishing()) {
-                return;
-            }
-
-            materialCalendarView.addDecorator(new EventDecorator(Color.RED, calendarDays,HistoryActivity.this));
-        }
-    }
-
 }

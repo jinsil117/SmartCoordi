@@ -7,6 +7,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 
 public class HistoryFragment extends Fragment {
     @Override
