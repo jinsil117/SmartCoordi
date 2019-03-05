@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HistoryActivity"
+    tools:context=".HistoryActivity_dev"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="wrap_content"
@@ -30,10 +30,6 @@
             android:text="다음달"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/testbtn"/>
     </LinearLayout>
     <TableLayout
         android:layout_width="match_parent"
