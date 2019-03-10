@@ -1,11 +1,17 @@
 package com.pickth.dddd.smartcoordination;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -15,12 +21,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 public class HistroryFragment_dev extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
 
@@ -33,6 +44,8 @@ public class HistroryFragment_dev extends Fragment implements View.OnClickListen
     int Year, Month;
     int width,height;
     DisplayMetrics dm;
+    private static final int PICK_FROM_CAMERA = 0; //사진을 촬영하고 찍힌 이미지를 처리하는 부분
+    private Uri mImageCaptureUri; //크롭된 이미지에 대한 Uri(Uniform Resource Identifier = 통합 자원 식별자)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +53,7 @@ public class HistroryFragment_dev extends Fragment implements View.OnClickListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
 
         View view = inflater.inflate(R.layout.fragment_history,container,false);
         tv = (TextView)view.findViewById(R.id.tv); //year, month
@@ -154,7 +168,23 @@ public class HistroryFragment_dev extends Fragment implements View.OnClickListen
                 public void onClick(DialogInterface dialog, int pos) {
                     String selectedText = items[pos].toString();
                     if (selectedText.equals("사진촬영")) {
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //사진을 찍기 위하여 설정
+
+                        // 임시로 사용할 파일의 경로를 생성
+                        String url = "tmp_" + String.valueOf(System.currentTimeMillis()) + ".jpg";
+                        // mImageCaptureUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), url));
+                        FileProvider.getUriForFile(getContext(), "com.pickth.dddd.smartcoordination.fileprovider", new File(Environment.getExternalStorageDirectory(), url));
+                        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+
+                        startActivityForResult(intent, PICK_FROM_CAMERA);
                     } else if (selectedText.equals("갤러리")) {
+                        Intent intent = new Intent(Intent.ACTION_PICK);
+                        //intent.setType("image/*");
+                        intent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); //갤러리에서 여러 이미지를 선택
+                        startActivityForResult(intent, 1); //시작할 액티비티를 통해 어떠한 값을 받을 것을 기대하고 액티비티를 시작
+
                     } else {
 
                     }
