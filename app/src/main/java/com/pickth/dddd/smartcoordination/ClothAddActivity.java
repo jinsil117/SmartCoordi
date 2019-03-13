@@ -8,6 +8,18 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.common.io.ByteStreams;
+import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.CustomVisionPredictionManager;
+import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.PredictionEndpoint;
+import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.models.ImagePrediction;
+import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.models.Prediction;
+import com.microsoft.azure.cognitiveservices.vision.customvision.training.CustomVisionTrainingManager;
+import com.microsoft.azure.cognitiveservices.vision.customvision.training.TrainingApi;
+import com.microsoft.azure.cognitiveservices.vision.customvision.training.Trainings;
+import com.microsoft.azure.cognitiveservices.vision.customvision.training.models.Project;
+
+import java.util.UUID;
+
 public class ClothAddActivity extends AppCompatActivity {
     EditText etTitle;
 
@@ -17,6 +29,37 @@ public class ClothAddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cloth_add);
 
         etTitle = findViewById(R.id.et_add_title);
+
+        //vision
+        try {
+            final String trainingApiKey = "";
+            final String predictionApiKey = "";
+
+            TrainingApi trainClient = CustomVisionTrainingManager.authenticate(trainingApiKey);
+            PredictionEndpoint predictClient = CustomVisionPredictionManager.authenticate(predictionApiKey);
+
+            Trainings trainer = trainClient.trainings();
+            UUID uuid = UUID.fromString("");
+            Toast.makeText(this, uuid.toString()+1, Toast.LENGTH_SHORT).show();
+            Project project = trainer.getProject(uuid);
+            Toast.makeText(this, uuid.toString()+2, Toast.LENGTH_SHORT).show();
+
+            // load test image
+            byte[] testImage = GetImage("/Test", "test_image.jpg");
+
+            // predictClient 개체를 통해 표현되는 예측 엔드포인트는 현재 모델에 이미지를 제출하고 분류 예측을 가져오는 데 참조
+            ImagePrediction results = predictClient.predictions().predictImage()
+                    .withProjectId(project.id())
+                    .withImageData(testImage)
+                    .execute();
+
+            for (Prediction prediction: results.predictions()) {
+                Toast.makeText(this, String.format("\t%s: %.2f%%", prediction.tagName(), prediction.probability() * 100.0f), Toast.LENGTH_SHORT).show();
+            }
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -43,5 +86,16 @@ public class ClothAddActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private static byte[] GetImage(String folder, String fileName)
+    {
+        try {
+            return ByteStreams.toByteArray(ClothAddActivity.class.getResourceAsStream(folder + "/" + fileName));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 }
