@@ -2,8 +2,8 @@ package com.pickth.dddd.smartcoordination;
 
 
 public class DayInfo {
-    String day;
-    String imgPath;
+    String day; //날짜
+    String imgPath; //이미지경로
 
     public DayInfo() {
     }

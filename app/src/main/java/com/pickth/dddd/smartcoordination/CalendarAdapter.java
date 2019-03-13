@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class CalendarAdapter extends BaseAdapter
 {
-    private ArrayList<DayInfo> mDayList;
+    private ArrayList<DayInfo> mDayList; //날짜 저장 배열
     private Context mContext;
     private int mResource;
     private LayoutInflater mLiInflater;
@@ -71,7 +71,7 @@ public class CalendarAdapter extends BaseAdapter
     {
         DayInfo day = mDayList.get(position);
 
-        DayViewHolde dayViewHolder;
+        DayViewHolde dayViewHolder; //날짜, 이미지
 
         if(convertView == null)
         {
@@ -101,18 +101,18 @@ public class CalendarAdapter extends BaseAdapter
 
         if(day != null)
         {
-            dayViewHolder.tvDay.setText(day.getDay());
+            dayViewHolder.tvDay.setText(day.getDay()); //DayInfo에 저장되어있던 날짜 불러오기
 
 
-            if(position % 7 == 0)
+            if(position % 7 == 0) //일요일
             {
                 dayViewHolder.tvDay.setTextColor(Color.RED);
             }
-            else if(position % 7 == 6)
+            else if(position % 7 == 6) //토요일
             {
                 dayViewHolder.tvDay.setTextColor(Color.BLUE);
             }
-            else
+            else //평일
             {
                 dayViewHolder.tvDay.setTextColor(Color.BLACK);
             }
