@@ -28,6 +28,13 @@
         </android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
+    //인공지능(vision) 테스트버튼
+    <Button
+        android:id="@+id/btn_frag_clothes_visionTEST"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="vision TEST"/>
+
     //카메라 열기 fab
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab2"

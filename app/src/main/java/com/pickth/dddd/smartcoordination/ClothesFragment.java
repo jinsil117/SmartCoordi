@@ -1,11 +1,7 @@
 package com.pickth.dddd.smartcoordination;
 
-import android.app.Application;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -14,21 +10,17 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import static android.app.Activity.RESULT_OK;
@@ -36,6 +28,7 @@ import static android.app.Activity.RESULT_OK;
 public class ClothesFragment extends Fragment implements View.OnClickListener{
     RecyclerView rvCalendar;
     ClothesAdapter mAdapter;
+    Button btnVision;
 
     private RecyclerView.LayoutManager mLayoutManager;
     private Animation fab_open,fab_close; //fab을 활성화 및 비활성화에 따른 Animation
@@ -72,6 +65,10 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
         fab2.setOnClickListener(this);
 
         mPhotoImageView = (ImageView) view.findViewById(R.id.image); //fragment_clothes.xml에서의 imageView와 연결, 갤러리나 카메라로 크롭된 사진을 보여줌
+
+        //vision 테스트하는 버튼
+        btnVision = view.findViewById(R.id.btn_frag_clothes_visionTEST);
+        btnVision.setOnClickListener(this);
 
         //옷장 탭
         rvCalendar = view.findViewById(R.id.rv_clothes);
@@ -179,6 +176,10 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
             case R.id.fab2: //id값이 fab2
                 doTakePhotoAction();
                 //anim();
+                break;
+            case R.id.btn_frag_clothes_visionTEST:
+                Intent intent = new Intent(getContext(),ClothAddActivity.class);
+                startActivity(intent);
                 break;
         }
     }
