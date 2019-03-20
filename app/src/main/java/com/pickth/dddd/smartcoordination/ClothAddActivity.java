@@ -45,7 +45,7 @@ public class ClothAddActivity extends AppCompatActivity {
             Toast.makeText(this, uuid.toString()+2, Toast.LENGTH_SHORT).show();
 
             // load test image
-            byte[] testImage = GetImage("/Test", "test_image.jpg");
+            byte[] testImage = GetImage("/drawable", "test_image.png");
 
             // predictClient 개체를 통해 표현되는 예측 엔드포인트는 현재 모델에 이미지를 제출하고 분류 예측을 가져오는 데 참조
             ImagePrediction results = predictClient.predictions().predictImage()
