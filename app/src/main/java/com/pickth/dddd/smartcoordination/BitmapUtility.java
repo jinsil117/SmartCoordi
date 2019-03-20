@@ -1,4 +1,4 @@
-package com.github.gabrielbb.cutout;
+package com.pickth.dddd.smartcoordination;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

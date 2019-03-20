@@ -1,4 +1,4 @@
-package com.github.gabrielbb.cutout;
+package com.pickth.dddd.smartcoordination;
 
 import android.Manifest;
 import android.app.Activity;
@@ -37,7 +37,7 @@ import top.defaults.checkerboarddrawable.CheckerboardDrawable;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
-import static com.github.gabrielbb.cutout.CutOut.CUTOUT_EXTRA_INTRO;
+import static com.pickth.dddd.smartcoordination.CutOut.CUTOUT_EXTRA_INTRO;
 
 public class CutOutActivity extends AppCompatActivity {
 
@@ -60,6 +60,8 @@ public class CutOutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
         setContentView(R.layout.activity_photo_edit);
 
         Toolbar toolbar = findViewById(R.id.photo_edit_toolbar);
@@ -72,7 +74,7 @@ public class CutOutActivity extends AppCompatActivity {
         int sdk = android.os.Build.VERSION.SDK_INT;
 
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            drawViewLayout.setBackgroundDrawable(CheckerboardDrawable.create());
+            drawViewLayout.setBackground(CheckerboardDrawable.create());
         } else {
             drawViewLayout.setBackground(CheckerboardDrawable.create());
         }

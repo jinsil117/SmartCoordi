@@ -1,18 +1,16 @@
-package com.github.gabrielbb.cutout;
+package com.pickth.dddd.smartcoordination;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Pair;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.UUID;
 
 import static android.view.View.VISIBLE;
 

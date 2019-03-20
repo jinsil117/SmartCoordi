@@ -1,4 +1,4 @@
-package com.github.gabrielbb.cutout;
+package com.pickth.dddd.smartcoordination;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,7 +29,7 @@ public class CutOut {
     public static final class ActivityBuilder {
 
         @Nullable
-        private Uri source; // The image to crop source Android uri
+        private Uri source; // source 안드로이드 uri를 크롭하기 위한 이미지. The image to crop source Android uri
         private boolean bordered;
         private boolean crop = true; // By default the cropping activity is started
         private boolean intro;
@@ -66,6 +66,8 @@ public class CutOut {
         }
 
         /**
+         * 초기값으로 사용자가 카메라와 갤러리로 부터 이미지를 선택할 수 있음.
+         * 또한 이 메서드로 미리 저장된 이미지를 불러올수 있음.
          * By default the user can select images from camera or gallery but you can also call this method to load a pre-saved image
          *
          * @param source {@link android.net.Uri} instance of the image to be loaded
@@ -76,6 +78,7 @@ public class CutOut {
         }
 
         /**
+         * 마지막 PNG 이미지에 하얀 border(반경테두리)를 추가해주는 메서드
          * This method adds a white border around the final PNG image
          */
         public ActivityBuilder bordered() {

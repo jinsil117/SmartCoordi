@@ -159,6 +159,66 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+    //임시로 비트맵을 png로 저장하도록 하는 방법 구상중 2019.03.15 여니
+//    /*
+//
+//     * Bitmap을 저장하는 부분
+//
+//     */
+//
+//    private void storeCropImage(Bitmap bitmap, String filePath) {
+//
+//        // SmartCoordiAlbum 폴더를 생성하여 이미지를 저장하는 방식이다.
+//
+//        String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/SmartCoordiAlbum";
+//
+//        File directory_SmartCoordiAlbum = new File(dirPath);
+//
+//
+//        if(!directory_SmartCoordiAlbum.exists()) // SmartCoordiAlbum 디렉터리에 폴더가 없다면 (새로 이미지를 저장할 경우에 속한다.)
+//
+//            directory_SmartCoordiAlbum.mkdir();
+//
+//
+//        File copyFile = new File(filePath);
+//
+//        BufferedOutputStream out = null;
+//
+//
+//        try {
+//
+//
+//            copyFile.createNewFile();
+//
+//            out = new BufferedOutputStream(new FileOutputStream(copyFile));
+//
+//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+//
+//
+//            // sendBroadcast를 통해 Crop된 사진을 앨범에 보이도록 갱신한다.
+//
+//            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+//
+//                    Uri.fromFile(copyFile)));
+//
+//
+//
+//            out.flush();
+//
+//            out.close();
+//
+//        } catch (Exception e) {
+//
+//            e.printStackTrace();
+//
+//        }
+//
+//    }
+//
+//}
+////https://jeongchul.tistory.com/287 [Jeongchul]
+
+
     @Override
     public void onClick(View v) {  //70줄의 setOnClickListener(this)과 관련된 것으로 onClick(View v)의 메소드를 통해 View 객체를 받아오는 것
         int id = v.getId(); // fab, fab1, fab2 이므로 View v의 id값을 가져온다(v.getId())
