@@ -10,7 +10,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     compileSdkVersion 27
-    buildToolsVersion "23.0.1"
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.pickth.dddd.smartcoordination"
         minSdkVersion 19
