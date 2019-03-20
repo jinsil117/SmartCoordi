@@ -33,10 +33,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Initializing the TabLayout
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        tabLayout.addTab(tabLayout.newTab().setText("코디"));
         tabLayout.addTab(tabLayout.newTab().setText("옷장"));
         tabLayout.addTab(tabLayout.newTab().setText("룩북"));
         tabLayout.addTab(tabLayout.newTab().setText("히스토리"));
-        tabLayout.addTab(tabLayout.newTab().setText("빨래통"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         // Initializing ViewPager

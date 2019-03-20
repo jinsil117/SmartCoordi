@@ -8,7 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class LaundryFragment extends Fragment {
+import com.pickth.dddd.smartcoordination.R;
+
+/**
+ * Created by jinsil on 2019-03-20.
+ */
+
+public class CoordiFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,7 +23,7 @@ public class LaundryFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_laundry,container,false);
+        View view = inflater.inflate(R.layout.fragment_coordi,container,false);
 
 
         return view;

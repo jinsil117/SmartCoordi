@@ -19,17 +19,17 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
         // Returning the current tabs
         switch (position) {
             case 0:
+                CoordiFragment laundryFragment = new CoordiFragment();
+                return laundryFragment;
+            case 1:
                 ClothesFragment clothesFragment = new ClothesFragment();
                 return clothesFragment;
-            case 1:
+            case 2:
                 LookbookFragment lookbookFragment = new LookbookFragment();
                 return lookbookFragment;
-            case 2:
+            case 3:
                 HistroryFragment_dev historyFragment = new HistroryFragment_dev();
                 return historyFragment;
-            case 3:
-                LaundryFragment laundryFragment = new LaundryFragment();
-                return laundryFragment;
             default:
                 return null;
         }
