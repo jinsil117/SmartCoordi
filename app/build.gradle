@@ -15,6 +15,7 @@ android {
         applicationId "com.pickth.dddd.smartcoordination"
         minSdkVersion 19
         targetSdkVersion 27
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
