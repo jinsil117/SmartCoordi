@@ -19,6 +19,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions{
+            annotationProcessorOptions{
+                includeCompileClasspath true
+            }
+        }
     }
     buildTypes {
         release {
@@ -61,4 +66,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.microsoft.azure.cognitiveservices/azure-cognitiveservices-customvision-training
     implementation group: 'com.microsoft.azure.cognitiveservices', name: 'azure-cognitiveservices-customvision-training', version: '1.0.2-beta'
     annotationProcessor group: 'com.microsoft.azure.cognitiveservices', name: 'azure-cognitiveservices-customvision-training', version: '1.0.2-beta'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    implementation 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
+    implementation 'com.jakewharton:butterknife:7.0.1'
 }

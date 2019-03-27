@@ -1,0 +1,11 @@
+diff a/app/build.gradle b/app/build.gradle	(rejected hunks)
+@@ -74,4 +74,8 @@
+     // https://mvnrepository.com/artifact/com.microsoft.azure.cognitiveservices/azure-cognitiveservices-customvision-training
+     implementation group: 'com.microsoft.azure.cognitiveservices', name: 'azure-cognitiveservices-customvision-training', version: '1.0.2-beta'
+     annotationProcessor group: 'com.microsoft.azure.cognitiveservices', name: 'azure-cognitiveservices-customvision-training', version: '1.0.2-beta'
++
++    implementation 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
++    implementation 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
++    implementation 'com.jakewharton:butterknife:7.0.1'
+ }
+\ No newline at end of file
