@@ -1,5 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/tools">
     <string-array name="custom_weekdays" />
+
     <string-array name="custom_months" />
+
+    <string-array name="topBottoms_array">
+        <item>Top</item>
+        <item>Bottoms</item>
+    </string-array>
+
+    <string-array name="length_array">
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>9</item>
+    </string-array>
+
+    <string-array name="season_array">
+        <item>spring</item>
+        <item>summer</item>
+        <item>fall</item>
+        <item>winter</item>
+    </string-array>
+
+    <string-array name="color_array">
+        <item
+            android:icon="@drawable/ic_photo_black_24dp"
+            android:tint="@color/colorBrown"
+            android:color="@color/colorBrown"
+            android:background="@color/colorBrown">brown</item>
+        <item>black</item>
+        <item>yellow</item>
+        <item>pink</item>
+        <item>green</item>
+        <item>sky-blue</item>
+        <item>gray</item>
+        <item>white</item>
+        <item>navy</item>
+        <item>purple</item>
+        <item>red</item>
+        <item>charcoal</item>
+        <item>blue</item>
+    </string-array>
 </resources>

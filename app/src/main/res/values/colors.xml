@@ -15,4 +15,18 @@
     <color name="intro_magic_background_color">#373737</color>
     <color name="intro_manual_background_color">#E64E4E</color>
     <color name="intro_zoom_background_color">#4E5DE6</color>
+
+    <color name="colorBrown">#783712</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorYellow">#FFE400</color>
+    <color name="colorPink">#F361DC</color>
+    <color name="colorGreen">#2F9D27</color>
+    <color name="colorSky_blue">#6EE3F7</color>
+    <color name="colorGray">#8C8C8C</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorNavy">#002266</color>
+    <color name="colorPurple">#8041D9</color>
+    <color name="colorRed">#FF0000</color>
+    <color name="colorCharcoal">#783712</color>
+    <color name="colorBlue">#0054FF</color>
 </resources>
