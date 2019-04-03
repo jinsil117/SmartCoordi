@@ -6,8 +6,7 @@
         android:id="@+id/view_color"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_margin="2dp"
-        android:backgroundTint="@color/colorBrown"/>
+        android:layout_margin="2dp"/>
     <TextView
         android:id="@+id/tv_color"
         android:layout_width="wrap_content"

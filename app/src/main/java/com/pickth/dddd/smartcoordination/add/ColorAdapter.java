@@ -1,4 +1,4 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.add;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.pickth.dddd.smartcoordination.R;
 
 import java.util.ArrayList;
 
@@ -31,24 +33,17 @@ public class ColorAdapter extends ArrayAdapter<ColorItem> {
 
     private View initView(int position, View convertView, ViewGroup parent){
         if(convertView == null){
-//            convertView = LayoutInflater.from(mContext).inflate( R.layout.spinner_color, parent, false);
-//            convertView = LayoutInflater.from(getContext()).inflate( R.layout.spinner_color, null);
-
-            LayoutInflater li = ((LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
-            convertView = li.inflate(R.layout.spinner_color, null);
-//            Toast.makeText(getContext(), convertView.getBackground().toString(), Toast.LENGTH_LONG).show();
+            convertView = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.item_spinner_color, null);
         }
 
         View colorView = convertView.findViewById(R.id.view_color);
         TextView tvColor = convertView.findViewById(R.id.tv_color);
 
         ColorItem currentItem = getItem(position);
-
         if (currentItem != null) {
             colorView.setBackgroundColor(currentItem.getColor());
             tvColor.setText(currentItem.getColorName());
         }
-
         return convertView;
     }
 }

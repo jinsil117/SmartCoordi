@@ -1,4 +1,4 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.add;
 
 public class ColorItem {
     private String mColorName;

@@ -21,15 +21,19 @@ import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.mode
 import com.microsoft.azure.cognitiveservices.vision.customvision.training.CustomVisionTrainingManager;
 import com.microsoft.azure.cognitiveservices.vision.customvision.training.TrainingApi;
 import com.microsoft.azure.cognitiveservices.vision.customvision.training.Trainings;
-import com.microsoft.azure.cognitiveservices.vision.customvision.training.models.Iteration;
 import com.microsoft.azure.cognitiveservices.vision.customvision.training.models.Project;
+import com.pickth.dddd.smartcoordination.add.ColorAdapter;
+import com.pickth.dddd.smartcoordination.add.ColorItem;
+import com.pickth.dddd.smartcoordination.add.SetSpinner;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
 public class ClothAddActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    Spinner spinnerTopBottoms, spinnerLength, spinnerSeason;
+    Spinner spinnerTopBottoms, spinnerLength, spinnerSeason, spinnerColor;
     String TAG = getClass().getName();
+    String topBottoms, length, color;
+    ArrayList<ColorItem> mColorList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,48 +43,28 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
         spinnerTopBottoms = (Spinner) findViewById(R.id.spinner_topBottoms_clothAdd);
         spinnerTopBottoms.setOnItemSelectedListener(this);
         // Create an ArrayAdapter using the string array and a default spinnerTopBottoms layout
-        ArrayAdapter<CharSequence> adapterTopBottoms = ArrayAdapter.createFromResource(this, R.array.topBottoms_array, android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapterTopBottoms = ArrayAdapter.createFromResource(this, R.array.array_topBottoms, android.R.layout.simple_spinner_dropdown_item);
         //simple_spinner_dropdown_item or simple_spinner_item
         // Apply the adapterTopBottoms to the spinnerTopBottoms
         spinnerTopBottoms.setAdapter(adapterTopBottoms);
 
         spinnerLength = (Spinner)findViewById(R.id.spinner_length_clothAdd);
         spinnerLength.setOnItemSelectedListener(this);
-        ArrayAdapter<CharSequence> adapterLength = ArrayAdapter.createFromResource(this, R.array.length_array, android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapterLength = ArrayAdapter.createFromResource(this, R.array.array_length, android.R.layout.simple_spinner_dropdown_item);
         spinnerLength.setAdapter(adapterLength);
 
         spinnerSeason = (Spinner)findViewById(R.id.spinner_season_clothAdd);
         spinnerSeason.setOnItemSelectedListener(this);
-        ArrayAdapter<CharSequence> adapterSeason = ArrayAdapter.createFromResource(this, R.array.season_array, android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapterSeason = ArrayAdapter.createFromResource(this, R.array.array_season, android.R.layout.simple_spinner_dropdown_item);
         spinnerSeason.setAdapter(adapterSeason);
 
-//        spinnerColor = (Spinner)findViewById(R.id.spinner_color_clothAdd);
-//        spinnerColor.setOnItemSelectedListener(this);
-//        ArrayAdapter<CharSequence> adapterColor = ArrayAdapter.createFromResource(this, R.array.color_array, android.R.layout.simple_spinner_dropdown_item);
-//        spinnerColor.setAdapter(adapterColor);
-
         //spinnerColor 초기화
-        ArrayList<ColorItem> mColorList = new ArrayList<>();
-        Toast.makeText(this, "왜 컬ㄹ가 안뜨는데", Toast.LENGTH_LONG).show();
-        mColorList.add(new ColorItem("brown", R.color.colorBrown));
-        mColorList.add(new ColorItem("black", R.color.colorBlack));
-        mColorList.add(new ColorItem("yellow", R.color.colorYellow));
-        mColorList.add(new ColorItem("pink", R.color.colorPink));
-        mColorList.add(new ColorItem("green", R.color.colorGreen));
-        mColorList.add(new ColorItem("sky-blue", R.color.colorSky_blue));
-        mColorList.add(new ColorItem("gray", R.color.colorGray));
-        mColorList.add(new ColorItem("white", R.color.colorWhite));
-        mColorList.add(new ColorItem("navy", R.color.colorNavy));
-        mColorList.add(new ColorItem("purple", R.color.colorPurple));
-        mColorList.add(new ColorItem("red", R.color.colorRed));
-        mColorList.add(new ColorItem("charcoal", R.color.colorCharcoal));
-        mColorList.add(new ColorItem("blue", R.color.colorBlue));
+        mColorList = new ArrayList<>();
+        initList();
 
-        Spinner spinnerColor = findViewById(R.id.spinner_color_clothAdd);
+        spinnerColor = findViewById(R.id.spinner_color_clothAdd);
         ColorAdapter mAdapter = new ColorAdapter(this, mColorList);
         spinnerColor.setAdapter(mAdapter);
-
-        Toast.makeText(this, R.string.app_name, Toast.LENGTH_LONG).show();
 
         spinnerColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -96,27 +80,26 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
         });
 
         new GetAzureDataAsyncTask().execute();
+//        new GetAzureDataAsyncTask2(getApplicationContext()).execute();
+//        Toast.makeText(this, R.string.app_name, Toast.LENGTH_LONG).show();
 
     }
 
-//    private void initList() {
-//        mColorList = new ArrayList<>();
-//        Toast.makeText(this, "왜 컬ㄹ가 안뜨는데", Toast.LENGTH_LONG).show();
-//        mColorList.add(new ColorItem("brown", R.color.colorBrown));
-//        mColorList.add(new ColorItem("black", R.color.colorBlack));
-//        mColorList.add(new ColorItem("yellow", R.color.colorYellow));
-//        mColorList.add(new ColorItem("pink", R.color.colorPink));
-//        mColorList.add(new ColorItem("green", R.color.colorGreen));
-//        mColorList.add(new ColorItem("sky-blue", R.color.colorSky_blue));
-//        mColorList.add(new ColorItem("gray", R.color.colorGray));
-//        mColorList.add(new ColorItem("white", R.color.colorWhite));
-//        mColorList.add(new ColorItem("navy", R.color.colorNavy));
-//        mColorList.add(new ColorItem("purple", R.color.colorPurple));
-//        mColorList.add(new ColorItem("red", R.color.colorRed));
-//        mColorList.add(new ColorItem("charcoal", R.color.colorCharcoal));
-//        mColorList.add(new ColorItem("blue", R.color.colorBlue));
-//        Toast.makeText(this, "왜 컬ㄹ가 안뜨는데", Toast.LENGTH_LONG).show();
-//    }
+    private void initList() {
+        mColorList.add(new ColorItem("brown", this.getResources().getColor(R.color.colorBrown)));
+        mColorList.add(new ColorItem("black", this.getResources().getColor(R.color.colorBlack)));
+        mColorList.add(new ColorItem("yellow", this.getResources().getColor(R.color.colorYellow)));
+        mColorList.add(new ColorItem("pink", this.getResources().getColor(R.color.colorPink)));
+        mColorList.add(new ColorItem("green", this.getResources().getColor(R.color.colorGreen)));
+        mColorList.add(new ColorItem("sky-blue", this.getResources().getColor(R.color.colorSky_blue)));
+        mColorList.add(new ColorItem("gray", this.getResources().getColor(R.color.colorGray)));
+        mColorList.add(new ColorItem("white", this.getResources().getColor(R.color.colorWhite)));
+        mColorList.add(new ColorItem("navy", this.getResources().getColor(R.color.colorNavy)));
+        mColorList.add(new ColorItem("purple", this.getResources().getColor(R.color.colorPurple)));
+        mColorList.add(new ColorItem("red", this.getResources().getColor(R.color.colorRed)));
+        mColorList.add(new ColorItem("charcoal", this.getResources().getColor(R.color.colorCharcoal)));
+        mColorList.add(new ColorItem("blue", this.getResources().getColor(R.color.colorBlue)));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) { //액션바 우측에 더하기 메뉴 생성
@@ -160,17 +143,14 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
 
                 UUID uuid = UUID.fromString(getApplicationContext().getString(R.string.projectId));
 
-                Iteration it = trainer.trainProject(uuid);
+                //생성된 Iteration을 삭제하지 않으면 없어도 동작한다.
+//                Iteration it = trainer.trainProject(uuid);
+//                while(it.status().equals("Training")) {
+//                    Thread.sleep(1000);
+//                    it = trainer.getIteration(uuid, it.id());
+//                }
+//                trainer.updateIteration(uuid, it.id(), it.withIsDefault(true));
 
-                while(it.status().equals("Training")) {
-                    Thread.sleep(1000);
-                    it = trainer.getIteration(uuid, it.id());
-                }
-
-
-                trainer.updateIteration(uuid, it.id(), it.withIsDefault(true));
-
-                Log.d(TAG, uuid.toString()+1);
                 Project project = trainer.getProject(uuid);
                 Log.d(TAG, "성ㄷ공");
 
@@ -183,10 +163,24 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
                         .withImageData(testImage)
                         .execute();
 
+                int i=0;
                 for (Prediction prediction: results.predictions()) {
-                    Log.d(TAG, String.format("\t%s: %.2f%%", prediction.tagName(), prediction.probability() * 100.0f));
-//                    Toast.makeText(this, String.format("\t%s: %.2f%%", prediction.tagName(), prediction.probability() * 100.0f), Toast.LENGTH_SHORT).show();
+                    if (i<3) {
+                        Log.d(TAG, String.format("\t%s: %.2f%%", prediction.tagName(), prediction.probability() * 100.0f));
+                        if (prediction.tagName().equals("상의") || prediction.tagName().equals("하의"))
+                            topBottoms = prediction.tagName();
+                        else if (prediction.tagName().equals("3부") || prediction.tagName().equals("5부") || prediction.tagName().equals("7부") || prediction.tagName().equals("9부"))
+                            length = prediction.tagName();
+                        else
+                            color = prediction.tagName();
+
+                        new SetSpinner(prediction.tagName(), spinnerTopBottoms, spinnerLength, spinnerColor).set();
+
+                        i++;
+                    }else break;
                 }
+                Log.d(TAG, String.format("%s %s %s", topBottoms, length, color));
+
             }catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
@@ -201,7 +195,7 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
     }
 
 
-    private static byte[] GetImage(String folder, String fileName)
+    public static byte[] GetImage(String folder, String fileName)
     {
         try {
             return ByteStreams.toByteArray(ClothAddActivity.class.getResourceAsStream(folder + "/" + fileName));
@@ -218,6 +212,5 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 }
