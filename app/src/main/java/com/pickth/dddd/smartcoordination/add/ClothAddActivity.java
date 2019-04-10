@@ -1,45 +1,46 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.add;
 
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.common.io.ByteStreams;
-import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.CustomVisionPredictionManager;
-import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.PredictionEndpoint;
-import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.models.ImagePrediction;
-import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.models.Prediction;
-import com.microsoft.azure.cognitiveservices.vision.customvision.training.CustomVisionTrainingManager;
-import com.microsoft.azure.cognitiveservices.vision.customvision.training.TrainingApi;
-import com.microsoft.azure.cognitiveservices.vision.customvision.training.Trainings;
-import com.microsoft.azure.cognitiveservices.vision.customvision.training.models.Project;
-import com.pickth.dddd.smartcoordination.add.ColorAdapter;
-import com.pickth.dddd.smartcoordination.add.ColorItem;
-import com.pickth.dddd.smartcoordination.add.SetSpinner;
+import com.pickth.dddd.smartcoordination.R;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.UUID;
+
+/**
+ * Created by HaEun
+ */
 
 public class ClothAddActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     Spinner spinnerTopBottoms, spinnerLength, spinnerSeason, spinnerColor;
-    String TAG = getClass().getName();
-    String topBottoms, length, color;
     ArrayList<ColorItem> mColorList;
+    ImageView imageView;
+
+    Bitmap bitmap;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cloth_add);
 
+        //상의와 하의 중에 선택하는 스피너 연결
         spinnerTopBottoms = (Spinner) findViewById(R.id.spinner_topBottoms_clothAdd);
         spinnerTopBottoms.setOnItemSelectedListener(this);
         // Create an ArrayAdapter using the string array and a default spinnerTopBottoms layout
@@ -48,16 +49,19 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
         // Apply the adapterTopBottoms to the spinnerTopBottoms
         spinnerTopBottoms.setAdapter(adapterTopBottoms);
 
+        //옷의 길이를 선택하는 스피너 연결
         spinnerLength = (Spinner)findViewById(R.id.spinner_length_clothAdd);
         spinnerLength.setOnItemSelectedListener(this);
         ArrayAdapter<CharSequence> adapterLength = ArrayAdapter.createFromResource(this, R.array.array_length, android.R.layout.simple_spinner_dropdown_item);
         spinnerLength.setAdapter(adapterLength);
 
+        //옷의 계절을 선택하는 스피너 연결
         spinnerSeason = (Spinner)findViewById(R.id.spinner_season_clothAdd);
         spinnerSeason.setOnItemSelectedListener(this);
         ArrayAdapter<CharSequence> adapterSeason = ArrayAdapter.createFromResource(this, R.array.array_season, android.R.layout.simple_spinner_dropdown_item);
         spinnerSeason.setAdapter(adapterSeason);
 
+        //옷의 색을 선택하는 스피너 연결
         //spinnerColor 초기화
         mColorList = new ArrayList<>();
         initList();
@@ -74,15 +78,31 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
+            public void onNothingSelected(AdapterView<?> adapterView) { }
         });
 
-        new GetAzureDataAsyncTask().execute();
-//        new GetAzureDataAsyncTask2(getApplicationContext()).execute();
-//        Toast.makeText(this, R.string.app_name, Toast.LENGTH_LONG).show();
+        //ClothesFragment에서 옷의 uri나 byte[]를 가져와 그에 해당하는 GetAzureDataAsyncTask를 생성한다.
+        Intent intent = getIntent();
+        Uri photoUri = intent.getParcelableExtra("imageUri");
+        byte[] arr = null;
+        arr = intent.getByteArrayExtra("image");
 
+        if (arr == null){
+            imageView = (ImageView) findViewById(R.id.iv_cloth_add);
+            imageView.setImageURI(photoUri);
+            try {
+                InputStream iStream =   getContentResolver().openInputStream(photoUri);
+                byte[] inputData = getBytes(iStream);
+                new GetAzureDataAsyncTask(getApplicationContext(), spinnerTopBottoms, spinnerLength, spinnerColor, inputData).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            bitmap = BitmapFactory.decodeByteArray(arr, 0, arr.length);
+            imageView = (ImageView) findViewById(R.id.iv_cloth_add);
+            imageView.setImageBitmap(bitmap);
+            new GetAzureDataAsyncTask(getApplicationContext(), spinnerTopBottoms, spinnerLength, spinnerColor, bitmap).execute();
+        }
     }
 
     private void initList() {
@@ -121,80 +141,6 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
         }
     }
 
-    public class GetAzureDataAsyncTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            //vision
-            try {
-
-                final String trainingApiKey = getApplicationContext().getString(R.string.trainingApiKey);
-                final String predictionApiKey = getApplicationContext().getString(R.string.predictionApiKey);
-
-                TrainingApi trainClient = CustomVisionTrainingManager.authenticate(trainingApiKey);
-                PredictionEndpoint predictClient = CustomVisionPredictionManager.authenticate(predictionApiKey);
-
-                Trainings trainer = trainClient.trainings();
-
-                UUID uuid = UUID.fromString(getApplicationContext().getString(R.string.projectId));
-
-                //생성된 Iteration을 삭제하지 않으면 없어도 동작한다.
-//                Iteration it = trainer.trainProject(uuid);
-//                while(it.status().equals("Training")) {
-//                    Thread.sleep(1000);
-//                    it = trainer.getIteration(uuid, it.id());
-//                }
-//                trainer.updateIteration(uuid, it.id(), it.withIsDefault(true));
-
-                Project project = trainer.getProject(uuid);
-                Log.d(TAG, "성ㄷ공");
-
-                // load test image
-                byte[] testImage = GetImage("/res/drawable", "test_image.png");
-
-                // predictClient 개체를 통해 표현되는 예측 엔드포인트는 현재 모델에 이미지를 제출하고 분류 예측을 가져오는 데 참조
-                ImagePrediction results = predictClient.predictions().predictImage()
-                        .withProjectId(project.id())
-                        .withImageData(testImage)
-                        .execute();
-
-                int i=0;
-                for (Prediction prediction: results.predictions()) {
-                    if (i<3) {
-                        Log.d(TAG, String.format("\t%s: %.2f%%", prediction.tagName(), prediction.probability() * 100.0f));
-                        if (prediction.tagName().equals("상의") || prediction.tagName().equals("하의"))
-                            topBottoms = prediction.tagName();
-                        else if (prediction.tagName().equals("3부") || prediction.tagName().equals("5부") || prediction.tagName().equals("7부") || prediction.tagName().equals("9부"))
-                            length = prediction.tagName();
-                        else
-                            color = prediction.tagName();
-
-                        new SetSpinner(prediction.tagName(), spinnerTopBottoms, spinnerLength, spinnerColor).set();
-
-                        i++;
-                    }else break;
-                }
-                Log.d(TAG, String.format("%s %s %s", topBottoms, length, color));
-
-            }catch (Exception e) {
-                System.out.println(e.getMessage());
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-    }
-
-
     public static byte[] GetImage(String folder, String fileName)
     {
         try {
@@ -204,6 +150,18 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
             e.printStackTrace();
         }
         return null;
+    }
+
+    public byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 
     @Override
