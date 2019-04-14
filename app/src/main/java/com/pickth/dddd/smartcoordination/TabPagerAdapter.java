@@ -28,7 +28,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 LookbookFragment lookbookFragment = new LookbookFragment();
                 return lookbookFragment;
             case 3:
-                HistroryFragment_dev historyFragment = new HistroryFragment_dev();
+                HistoryFragment_dev historyFragment = new HistoryFragment_dev();
                 return historyFragment;
             default:
                 return null;

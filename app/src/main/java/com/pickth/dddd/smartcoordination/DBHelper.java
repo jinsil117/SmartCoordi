@@ -14,24 +14,9 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void onCreate(SQLiteDatabase db){
-        sb = new StringBuffer();
-        sb.append("create table clothesTBL (");
-        sb.append("idx_ integer primary key autoincrement,");
-        sb.append("category text,");
-        sb.append("length text,");
-        sb.append("season text,");
-        sb.append("color text");
-        sb.append("img blob");
-        db.execSQL(sb.toString());
-
-        sb = new StringBuffer();
-        sb.append("create table shoesTBL (");
-        sb.append("idx_ integer primary key autoincrement,");
-        sb.append("category text,");
-        sb.append("season text,");
-        sb.append("color text");
-        sb.append("img blob");
-        db.execSQL(sb.toString());
+        db.execSQL("CREATE TABLE clothesTBL(num INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, length TEXT, season TEXT, color TEXT, img BLOB)"); //옷 정보 저장 테이블
+        db.execSQL("CREATE TABLE shoesTBL(num INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, length TEXT, season TEXT, color TEXT, img BLOB)"); //신발 정보 저장 테이블
+        db.execSQL("CREATE TABLE historyTBL (num INTEGER PRIMARY KEY, year TEXT, month TEXT, day TEXT, img BLOB);"); //히스토리 사진 저장 테이블
     }
 
     @Override

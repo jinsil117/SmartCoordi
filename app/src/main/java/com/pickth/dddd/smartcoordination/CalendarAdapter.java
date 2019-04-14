@@ -1,6 +1,11 @@
 package com.pickth.dddd.smartcoordination;
 
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -22,6 +27,8 @@ public class CalendarAdapter extends BaseAdapter
     private int mResource;
     private LayoutInflater mLiInflater;
     int width, height;
+    DBHelper dbHelper;
+    SQLiteDatabase db;
     /**
      * Adpater 생성자
      *
@@ -38,6 +45,7 @@ public class CalendarAdapter extends BaseAdapter
      */
     public CalendarAdapter(Context context, int textResource, ArrayList<DayInfo> dayList, int width, int height)
     {
+        dbHelper = new DBHelper(mContext);
         this.mContext = context;
         this.mDayList = dayList;
         this.mResource = textResource;
@@ -52,7 +60,6 @@ public class CalendarAdapter extends BaseAdapter
         // TODO Auto-generated method stub
         return mDayList.size();
     }
-
     @Override
     public Object getItem(int position)
     {
@@ -66,12 +73,17 @@ public class CalendarAdapter extends BaseAdapter
         return 0;
     }
 
+    public void setImage(int position, byte[] bytes){
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
         DayInfo day = mDayList.get(position);
-
-        DayViewHolde dayViewHolder; //날짜, 이미지
+        Bitmap bm = day.getBm();
+        DayViewHolde dayViewHolder = new DayViewHolde(); //날짜, 이미지
 
         if(convertView == null)
         {
@@ -87,8 +99,6 @@ public class CalendarAdapter extends BaseAdapter
             }
 
 
-            dayViewHolder = new DayViewHolde();
-
             dayViewHolder.img = (ImageView) convertView.findViewById(R.id.day_img);
             dayViewHolder.tvDay = (TextView) convertView.findViewById(R.id.day_tv);
 
@@ -97,6 +107,10 @@ public class CalendarAdapter extends BaseAdapter
         else
         {
             dayViewHolder = (DayViewHolde) convertView.getTag();
+        }
+
+        if(day.getBm() != null) {
+            dayViewHolder.img.setImageBitmap(bm);
         }
 
         if(day != null)
@@ -118,6 +132,7 @@ public class CalendarAdapter extends BaseAdapter
             }
 
         }
+
         return convertView;
     }
 
