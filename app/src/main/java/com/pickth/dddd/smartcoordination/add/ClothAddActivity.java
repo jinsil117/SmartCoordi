@@ -140,7 +140,8 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
                 String color = spinnerColor.getSelectedItem().toString();
 
                 // 입력한 값을 파일에 저장하는 부분
-                new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(photoUri));
+//                new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(photoUri));
+                new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(photoUri, season));
                 Log.d("Adddd", "finish()");
                 finish();
                 return true;

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.pickth.dddd.smartcoordination.R;
 
@@ -16,13 +17,13 @@ import java.util.ArrayList;
 
 public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ClothesClickListener mClickListener;
+    ArrayList<ClothesItem> items = new ArrayList<>();
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         Log.d("Adddd", "onCreate");
-        View itemView = null;
-        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cloth_thumbnail, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cloth_thumbnail, parent, false);
         return new ClothesViewHolder(itemView);
     }
 
@@ -37,11 +38,16 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         // 뷰 홀더에 바인딩하는 부분
         ((ClothesViewHolder) holder).onBind(mClickListener);
+//        ((ClothesViewHolder) holder).onBind(items.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return items.size();
+    }
+
+    public void addItem(ClothesItem item) {
+        items.add(item);
     }
 
     /**
@@ -54,8 +60,9 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     class ClothesViewHolder extends RecyclerView.ViewHolder {
         ClothesDataManager manager;
-        ArrayList<ClothesItem> items;
+//        ArrayList<ClothesItem> items;
         ImageView ivCloth = itemView.findViewById(R.id.iv_cloth_thumbnail);
+        TextView tvSeason = itemView.findViewById(R.id.tv_cloth_thumbnail);
 
         ClothesViewHolder(View view) {
             super(view);
@@ -68,7 +75,7 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             items = manager.getClothesItems();
 
             // recycler view로 아이템 리스트 뿌려주기
-            ClothesListAdapterThumbnail adapter = new ClothesListAdapterThumbnail(0);
+            ClothesAdapter adapter = new ClothesAdapter();
             RecyclerView rvClothes = itemView.findViewById(R.id.rv_clothes_he);
             rvClothes.setAdapter(adapter);
             rvClothes.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayout.VERTICAL,false));
@@ -89,8 +96,9 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             });
         }
 
-        void onBind(ClothesItem item, int positoin) {
+        void onBind(ClothesItem item) {
             ivCloth.setImageURI(item.mImage);
+            tvSeason.setText(item.mSeason);
         }
     }
 }

@@ -21,6 +21,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
+import com.pickth.dddd.smartcoordination.cloth.ClothesAdapter;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
