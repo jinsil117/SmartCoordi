@@ -1,4 +1,4 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.cloth;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,20 +10,24 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import com.pickth.dddd.smartcoordination.GridSpacingItemDecoration;
+import com.pickth.dddd.smartcoordination.R;
 import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
@@ -32,7 +36,6 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
     RecyclerView rvClothes;
     ClothesAdapter mAdapter;
 
-    private RecyclerView.LayoutManager mLayoutManager;
     private Animation fab_open,fab_close; //fab을 활성화 및 비활성화에 따른 Animation
     private Boolean isFabOpen = false; //처음 +버튼의 fab을 클릭할 경우 fab1과 fab2를 visible
     private FloatingActionButton fab, fab1, fab2; //fragment_clothes.xml에서 만든 fab을 이용하기 위한 선언
@@ -65,13 +68,23 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
         fab1.setOnClickListener(this); //167줄인 onClick(View v)의 메
         fab2.setOnClickListener(this);
 
-        //옷장 탭
-        rvClothes = view.findViewById(R.id.rv_clothes);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        rvClothes.setLayoutManager(mLayoutManager);
-        rvClothes.scrollToPosition(0);
+        // rvClothes를 연동할 adapter 설정
         mAdapter = new ClothesAdapter();
+        mAdapter.setClothesClickListener(new ClothesClickListener() {
+            @Override
+            public void onClick(ArrayList<ClothesItem> items) {
+//                // 달력을 눌렀을 때 다이얼로그가 나오게 하는 부분
+//                calendarListDialog = new CalendarListDialog(CalendarActivity.this, items, date);
+//                calendarListDialog.show();
+            }
+        });
+
+        // recycler view 설정
+        rvClothes = view.findViewById(R.id.rv_clothes_he);
         rvClothes.setAdapter(mAdapter);
+        rvClothes.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        rvClothes.addItemDecoration(new GridSpacingItemDecoration(getContext(), 7, 3, false));
+        Log.d("Adddd", "onCreateView");
 
         return view;
     }

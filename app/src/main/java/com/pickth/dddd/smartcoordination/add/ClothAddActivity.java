@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,10 +15,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.google.common.io.ByteStreams;
 import com.pickth.dddd.smartcoordination.R;
+import com.pickth.dddd.smartcoordination.cloth.ClothesDataManager;
+import com.pickth.dddd.smartcoordination.cloth.ClothesItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,8 +34,8 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
     Spinner spinnerTopBottoms, spinnerLength, spinnerSeason, spinnerColor;
     ArrayList<ColorItem> mColorList;
     ImageView imageView;
-
     Bitmap bitmap;
+    Uri photoUri;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,7 +85,7 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
 
         //ClothesFragment에서 옷의 uri나 byte[]를 가져와 그에 해당하는 GetAzureDataAsyncTask를 생성한다.
         Intent intent = getIntent();
-        Uri photoUri = intent.getParcelableExtra("imageUri");
+        photoUri = intent.getParcelableExtra("imageUri");
         byte[] arr = null;
         arr = intent.getByteArrayExtra("image");
 
@@ -91,6 +93,7 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
             imageView = (ImageView) findViewById(R.id.iv_cloth_add);
             imageView.setImageURI(photoUri);
             try {
+                //Image Uri를 byte[]로 변경
                 InputStream iStream =   getContentResolver().openInputStream(photoUri);
                 byte[] inputData = getBytes(iStream);
                 new GetAzureDataAsyncTask(getApplicationContext(), spinnerTopBottoms, spinnerLength, spinnerColor, inputData).execute();
@@ -131,9 +134,14 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_add :
-                Toast.makeText(this, spinnerTopBottoms.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+                String topBottoms = spinnerTopBottoms.getSelectedItem().toString();
+                String length = spinnerLength.getSelectedItem().toString();
+                String season = spinnerSeason.getSelectedItem().toString();
+                String color = spinnerColor.getSelectedItem().toString();
+
                 // 입력한 값을 파일에 저장하는 부분
-                //new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(title));
+                new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(photoUri));
+                Log.d("Adddd", "finish()");
                 finish();
                 return true;
             default:
