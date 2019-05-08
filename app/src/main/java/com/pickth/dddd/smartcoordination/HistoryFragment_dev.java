@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
     SQLiteDatabase db;
     int position;
     ChangeImage changeImage;
+    Bitmap bm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,38 +117,38 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
                 //년,월,일을 합쳐 하나의 키값으로 생성
                 String historyNum1 = ""+Year+""+Month+""+i;
                 int historyNum = Integer.parseInt(historyNum1);
-
-                Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM historyTBL WHERE num=" + historyNum, null);
-                if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
-                    Log.i("DB 검색중: ",""+historyNum);
-                    long blobStart = 1; //blob 시작
-                    long blobLen = 1; //blob 길이
-                    int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
-                    byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
-
-                    while (blobSize > 0) {
-                        blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
-                        blobSize -= blobLen;
-
-                        Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM historyTBL;", null);
-                        if (blobCursor.moveToNext()) {
-                            byte[] barr = blobCursor.getBlob(0);
-                            if (barr != null) {
-                                System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
-                            }
-                            blobCursor.close();
-
-                            blobStart += blobLen;
-                        }
-
-                    }
-                    Bitmap bm = changeImage.getImage(bytes);
-                    day.setBm(bm);
-                    bm = null;
-                    bytes = null;
-                }
-                sizeCursor.close();
-                db.close();
+//
+//                Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM historyTBL WHERE num=" + historyNum, null);
+//                if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+//                    Log.i("DB 검색중: ",""+historyNum);
+//                    long blobStart = 1; //blob 시작
+//                    long blobLen = 1; //blob 길이
+//                    int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+//                    byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+//
+//                    while (blobSize > 0) {
+//                        blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+//                        blobSize -= blobLen;
+//
+//                        Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM historyTBL;", null);
+//                        if (blobCursor.moveToNext()) {
+//                            byte[] barr = blobCursor.getBlob(0);
+//                            if (barr != null) {
+//                                System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+//                            }
+//                            blobCursor.close();
+//
+//                            blobStart += blobLen;
+//                        }
+//
+//                    }
+//                    Bitmap bm = changeImage.getImage(bytes);
+//                    day.setBm(bm);
+//                    bm = null;
+//                    bytes = null;
+//                }
+//                sizeCursor.close();
+//                db.close();
 
                 //날짜, 이미지 저장
                 day.setDay(Integer.toString(i));
@@ -180,42 +182,6 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == 1) { //갤러리에서 선택한 이미지 db에 저장하기
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                try {
-                    // 선택한 이미지를 비트맵으로 표현하기
-                    InputStream in = getActivity().getContentResolver().openInputStream(data.getData()); //이미지를 불러온다
-                    Bitmap bm = BitmapFactory.decodeStream(in); //이미지를 Bitmap 변수에 저장
-                    byte[] bytes = changeImage.getBytes(bm); //Bitmap 형식을 byte형식으로 변환 및 저장
-                    db = DBHelper.getWritableDatabase();
-                    String historyNum1 = ""+Year+""+Month+""+Day;
-
-                    //이미지 정보를 db에 저장
-                    SQLiteStatement p = db.compileStatement("INSERT INTO historyTBL values(?,?,?,?,?);");
-                    p.bindLong(1,Integer.parseInt(historyNum1));
-                    p.bindString(2, Integer.toString(Year));
-                    p.bindString(3, Integer.toString(Month)); //12월이면 11로 저장됨
-                    p.bindString(4, Day);
-                    p.bindBlob(5, bytes);
-                    p.execute();
-                    db.close();
-                    in.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        if(requestCode == 2){ //사진 삭제
-
-        }
-
-    }
-
-    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) { //날짜 선택
         DayInfo dayInfo = DayList.get(position); //사용자가 선택한 날짜 호출
         Day = dayInfo.getDay();
@@ -245,7 +211,11 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
                             startActivityForResult(intent, 1);
 
                             // 사진을 히스토리에 보여줌
-                            adapter.notifyDataSetChanged();
+                            //adapter.notifyDataSetChanged();
+                            dayInfo.img = (ImageView)view.findViewById(R.id.day_img);
+                            dayInfo.img.setImageBitmap(bm);
+
+                            bm = null;
                         } catch (Exception e) {
 
                         }
@@ -260,6 +230,42 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
             });
             builder.show();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == 1) { //갤러리에서 선택한 이미지 db에 저장하기
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                try {
+                    // 선택한 이미지를 비트맵으로 표현하기
+                    InputStream in = getActivity().getContentResolver().openInputStream(data.getData()); //이미지를 불러온다
+                    bm = BitmapFactory.decodeStream(in); //이미지를 Bitmap 변수에 저장
+//                    byte[] bytes = changeImage.getBytes(bm); //Bitmap 형식을 byte형식으로 변환 및 저장
+//                    db = DBHelper.getWritableDatabase();
+//                    String historyNum1 = ""+Year+""+Month+""+Day;
+//
+//                    //이미지 정보를 db에 저장
+//                    SQLiteStatement p = db.compileStatement("INSERT INTO historyTBL values(?,?,?,?,?);");
+//                    p.bindLong(1,Integer.parseInt(historyNum1));
+//                    p.bindString(2, Integer.toString(Year));
+//                    p.bindString(3, Integer.toString(Month)); //12월이면 11로 저장됨
+//                    p.bindString(4, Day);
+//                    p.bindBlob(5, bytes);
+//                    p.execute();
+//                    db.close();
+                    in.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if(requestCode == 2){ //사진 삭제
+
+        }
+
     }
 
     //어댑터 초기화 메서드

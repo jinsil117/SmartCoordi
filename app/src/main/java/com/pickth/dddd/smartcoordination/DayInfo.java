@@ -10,7 +10,8 @@ public class DayInfo {
     String day; //날짜
     Bitmap bm;
     int historyNum;
-
+    ImageView img;
+    
     public DayInfo() {
         bm = null;
     }
