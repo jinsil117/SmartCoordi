@@ -19,7 +19,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import com.pickth.dddd.smartcoordination.GridSpacingItemDecoration;
 import com.pickth.dddd.smartcoordination.R;
 import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
 
@@ -35,6 +34,8 @@ import static android.app.Activity.RESULT_OK;
 public class ClothesFragment_HE extends Fragment implements View.OnClickListener{
     RecyclerView rvClothes;
     ClothesAdapter mAdapter;
+    ClothesDataManager manager;
+    ArrayList<ClothesItem> items = new ArrayList<>();
 
     private Animation fab_open,fab_close; //fab을 활성화 및 비활성화에 따른 Animation
     private Boolean isFabOpen = false; //처음 +버튼의 fab을 클릭할 경우 fab1과 fab2를 visible
@@ -68,23 +69,31 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
         fab1.setOnClickListener(this); //167줄인 onClick(View v)의 메
         fab2.setOnClickListener(this);
 
+        manager = new ClothesDataManager(getContext());
+        items = manager.getClothesItems();
+
         // rvClothes를 연동할 adapter 설정
         mAdapter = new ClothesAdapter();
         mAdapter.setClothesClickListener(new ClothesClickListener() {
             @Override
             public void onClick(ArrayList<ClothesItem> items) {
-//                // 달력을 눌렀을 때 다이얼로그가 나오게 하는 부분
-//                calendarListDialog = new CalendarListDialog(CalendarActivity.this, items, date);
-//                calendarListDialog.show();
+                Log.d("rrrrr", "click");
             }
         });
+
+        //adapter에 item 추가하기
+        for(ClothesItem item: items)
+            mAdapter.addItem(item);
+
+        // 새로고침
+        mAdapter.notifyDataSetChanged();
 
         // recycler view 설정
         rvClothes = view.findViewById(R.id.rv_clothes_he);
         rvClothes.setAdapter(mAdapter);
         rvClothes.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        rvClothes.addItemDecoration(new GridSpacingItemDecoration(getContext(), 7, 3, false));
-        Log.d("Adddd", "onCreateView");
+//        rvClothes.addItemDecoration(new GridSpacingItemDecoration(getContext(), 7, 3, false));
+//        rvClothes.addItemDecoration(new DividerItemDecoration(getContext(), new LinearLayoutManager(getContext()).getOrientation()));
 
         return view;
     }
@@ -133,17 +142,9 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
             }
             case PICK_FROM_ALBUM: {
                 Uri uri = data.getData();
-                try {
-                    Intent intent = new Intent(getContext(),ClothAddActivity.class);
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    intent.putExtra("image",byteArray);
-                    startActivity(intent);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent(getContext(),ClothAddActivity.class);
+                intent.putExtra("imageUri", uri);
+                startActivity(intent);
                 break;
             }
         }

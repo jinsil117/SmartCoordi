@@ -2,8 +2,10 @@ package com.pickth.dddd.smartcoordination.add;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.microsoft.azure.cognitiveservices.vision.customvision.prediction.CustomVisionPredictionManager;
@@ -79,12 +81,19 @@ public class GetAzureDataAsyncTask extends AsyncTask<Void, Void, Void> {
             if (mBytes == null){
                 //앨범에서 선택한 옷 가져오기
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                mBitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);    //압축
                 byte[] byteArray = stream.toByteArray();
                 testImage = byteArray;
             }else {
-                testImage = mBytes;
+                Bitmap bitmap = BitmapFactory.decodeByteArray(mBytes, 0, mBytes.length);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                byte[] byteArray = stream.toByteArray();
+                testImage = byteArray;
+//                testImage = mBytes;
             }
+
+            Log.d(TAG, String.format("%d", testImage.length));
 
 
             // predictClient 개체를 통해 표현되는 예측 엔드포인트는 현재 모델에 이미지를 제출하고 분류 예측을 가져오는 데 참조
