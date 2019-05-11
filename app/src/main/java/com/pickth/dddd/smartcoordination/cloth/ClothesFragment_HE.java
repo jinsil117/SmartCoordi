@@ -91,8 +91,6 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
         rvClothes = view.findViewById(R.id.rv_clothes_he);
         rvClothes.setAdapter(mAdapter);
         rvClothes.setLayoutManager(new GridLayoutManager(getContext(), 3));
-//        rvClothes.addItemDecoration(new GridSpacingItemDecoration(getContext(), 7, 3, false));
-//        rvClothes.addItemDecoration(new DividerItemDecoration(getContext(), new LinearLayoutManager(getContext()).getOrientation()));
 
         return view;
     }
@@ -166,17 +164,6 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
         return image;
     }
 
-//    //편집할 이미지를 저장할 temp파일 생성
-//    private Uri createImageFile(){
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "JPEG_" + timeStamp + ".jpg";
-//        //저장 위치는 Android/data/앱패키지/picture/
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//
-//        Uri uri = Uri.fromFile(new File(storageDir, imageFileName));
-//        return uri;
-//    }
-
     @Override
     public void onClick(View v) {  //70줄의 setOnClickListener(this)과 관련된 것으로 onClick(View v)의 메소드를 통해 View 객체를 받아오는 것
         int id = v.getId(); // fab, fab1, fab2 이므로 View v의 id값을 가져온다(v.getId())
@@ -217,48 +204,13 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
      * @return String : 실제 파일 경로
      */
     public String getRealImagePath(Uri uri) {
-//        String res = null;
-//        String[] projection = {MediaStore.Images.Media.DATA};
-//        Cursor cursor = getContext().getContentResolver().query(uri, projection, null, null, MediaStore.Images.Media.DATE_MODIFIED + " desc");
-
-//        if (cursor.moveToFirst()){
-//            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//            res = cursor.getString(column_index);
-//        }
-//        cursor.close();
-//        return res;
-
-//        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//        cursor.moveToFirst();
-//        try {
-//            File tempFile = new File(cursor.getString(column_index));
-//            return tempFile.getAbsolutePath();
-//        }catch (Exception e){ }
-//        return uri.getPath();
-
-        String[] projection = { MediaStore.Images.Media.DATA };
-
-        if(uri == null){
-            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        }
-
-        Cursor mCursor = getContext().getContentResolver().query(uri, projection, null, null,
-                MediaStore.Images.Media.DATE_MODIFIED + " desc");
-
-        if(mCursor == null || mCursor.getCount() < 1){
-            return null;
-        }
-
-        int idxColumn = mCursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        mCursor.moveToFirst();
-
-        String path = mCursor.getString(idxColumn);
-
-        if(mCursor != null){
-            mCursor.close();
-            mCursor = null;
-        }
-
-        return path;
+        String res = null;
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContext().getContentResolver().query(uri, projection, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        res = cursor.getString(column_index);
+        cursor.close();
+        return res;
     }
 }
