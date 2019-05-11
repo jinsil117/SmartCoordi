@@ -20,6 +20,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -254,7 +255,7 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
                 //anim();
                 break;
             case R.id.btn_frag_clothes_visionTEST:
-                Intent intent = new Intent(getContext(),ClothAddActivity.class);
+                Intent intent = new Intent(getContext(), ClothAddActivity.class);
                 startActivity(intent);
                 break;
         }

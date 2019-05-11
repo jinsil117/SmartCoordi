@@ -51,7 +51,7 @@ public class ChangeImage extends AppCompatActivity {
         return data;
     }
 
-    public static Bitmap getImage(byte[] image) { //byte형식을 bitmap으로 변환
+    public static Bitmap getBitmap(byte[] image) { //byte형식을 bitmap으로 변환
         Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
         return bitmap;
     }

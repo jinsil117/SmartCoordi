@@ -11,7 +11,7 @@ public class DayInfo {
     Bitmap bm;
     int historyNum;
     ImageView img;
-    
+
     public DayInfo() {
         bm = null;
     }
