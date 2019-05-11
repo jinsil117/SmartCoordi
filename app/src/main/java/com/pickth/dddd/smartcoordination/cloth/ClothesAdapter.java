@@ -46,7 +46,7 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     /**
      *
-     * @param listener ClothesFragment_HE 에서 생성한 클릭리스너를 받아오는 부분
+     * @param listener ClothesFragment 에서 생성한 클릭리스너를 받아오는 부분
      */
     public void setClothesClickListener(ClothesClickListener listener) {
         mClickListener = listener;

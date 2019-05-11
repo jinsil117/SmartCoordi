@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.pickth.dddd.smartcoordination.cloth.ClothesFragment_HE;
+import com.pickth.dddd.smartcoordination.cloth.ClothesFragment;
 
 public class TabPagerAdapter extends FragmentStatePagerAdapter {
     // Count number of tabs
@@ -24,9 +24,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 CoordiFragment laundryFragment = new CoordiFragment();
                 return laundryFragment;
             case 1:
-//                ClothesFragment clothesFragment = new ClothesFragment();
-//                return clothesFragment;
-                ClothesFragment_HE clothesFragmentHE = new ClothesFragment_HE();
+                ClothesFragment clothesFragmentHE = new ClothesFragment();
                 return clothesFragmentHE;
             case 2:
                 LookbookFragment lookbookFragment = new LookbookFragment();
