@@ -30,7 +30,9 @@ public class ClothesDataManager {  //저장
             if(json == "") return mItems;
 
             Type type = new TypeToken<ArrayList<ClothesItem>>() {}.getType();
+//            Type type = TypeToken.getParameterized(ArrayList.class, ClothesItem.class).getType();
             mItems = new Gson().fromJson(json, type);
+
         }
         return mItems;
     }
@@ -51,8 +53,18 @@ public class ClothesDataManager {  //저장
      * @param item
      */
     public void addItem(ClothesItem item) {
-        Log.d("Adddd", "addItem");
         getClothesItems().add(item);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * 아이템을 삭제하는 메소드
+     * @param item
+     */
+    public void removeItem(ClothesItem item) {
+//        getClothesItems().remove(item);
+        mItems.remove(item);
+        Log.d("rrrrr", "remove");
         notifyDataSetChanged();
     }
 }

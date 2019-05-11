@@ -1,14 +1,12 @@
 package com.pickth.dddd.smartcoordination.cloth;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.pickth.dddd.smartcoordination.R;
@@ -22,7 +20,6 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        Log.d("Adddd", "onCreate");
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cloth_thumbnail, parent, false);
         return new ClothesViewHolder(itemView);
     }
@@ -34,11 +31,8 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
      */
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Log.d("Adddd", "onBindV");
-
         // 뷰 홀더에 바인딩하는 부분
-        ((ClothesViewHolder) holder).onBind(mClickListener);
-//        ((ClothesViewHolder) holder).onBind(items.get(position));
+        ((ClothesViewHolder) holder).onBind(mClickListener, position);
     }
 
     @Override
@@ -60,7 +54,6 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     class ClothesViewHolder extends RecyclerView.ViewHolder {
         ClothesDataManager manager;
-//        ArrayList<ClothesItem> items;
         ImageView ivCloth = itemView.findViewById(R.id.iv_cloth_thumbnail);
         TextView tvSeason = itemView.findViewById(R.id.tv_cloth_thumbnail);
 
@@ -68,24 +61,15 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             super(view);
         }
 
-        void onBind(final ClothesClickListener listener) {
-            Log.d("Adddd", "onBind");
-            // 아이템들, 데이터 메니저 초기화
+        void onBind(final ClothesClickListener listener, int position) {
+            // 아이템들, 데이터 매니저 초기화
             manager = new ClothesDataManager(itemView.getContext());
             items = manager.getClothesItems();
+            try {
+                ivCloth.setImageURI(Uri.parse(items.get(position).getmImage()));
+                tvSeason.setText(items.get(position).getmSeason());
+            }catch (Exception e){}
 
-            // recycler view로 아이템 리스트 뿌려주기
-            ClothesAdapter adapter = new ClothesAdapter();
-            RecyclerView rvClothes = itemView.findViewById(R.id.rv_clothes_he);
-            rvClothes.setAdapter(adapter);
-            rvClothes.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayout.VERTICAL,false));
-
-            //adapte에 item 추가하기
-            for(ClothesItem item: items)
-                adapter.addItem(item);
-
-            // 새로고침
-            adapter.notifyDataSetChanged();
 
             // 아이템을 눌렀을 때 클릭리스너. CalendarActivity에서 만든 클릭리스너를 CalendarAdapter에 넘겨서 여기서 사용한다.
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -94,11 +78,16 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     listener.onClick(items);
                 }
             });
-        }
 
-        void onBind(ClothesItem item) {
-            ivCloth.setImageURI(item.mImage);
-            tvSeason.setText(item.mSeason);
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    manager.removeItem(items.get(position));
+                    onBindViewHolder(ClothesViewHolder.this,position);
+                    return false;
+                }
+            });
+
         }
     }
 }

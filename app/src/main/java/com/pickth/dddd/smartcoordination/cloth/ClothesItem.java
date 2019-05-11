@@ -1,21 +1,24 @@
 package com.pickth.dddd.smartcoordination.cloth;
 
-import android.net.Uri;
-import android.util.Log;
-
 public class ClothesItem {
-    public Uri mImage;
+    String mImage;
     String mTopBottoms, mLength, mSeason, mColor;
     Boolean isInLaundry;
 
-    public ClothesItem(Uri image){
+    public ClothesItem(String image){
         this.mImage = image;
-        Log.d("mmmm", "image");
     }
 
-    public ClothesItem(Uri image, String season){
+    public ClothesItem(String image, String season){
         this.mImage = image;
         this.mSeason = season;
-        Log.d("mmmm", "image + season");
+    }
+
+    public String getmImage() {
+        return mImage;
+    }
+
+    public String getmSeason() {
+        return mSeason;
     }
 }

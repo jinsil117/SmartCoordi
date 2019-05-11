@@ -29,13 +29,13 @@ public class GetAzureDataAsyncTask extends AsyncTask<Void, Void, Void> {
     Bitmap mBitmap;
     byte[] mBytes;
 
-    public GetAzureDataAsyncTask(Context context, Spinner spinnerTopBottoms, Spinner spinnerLength, Spinner spinnerColor, Bitmap bitmap){
-        this.mContext = context;
-        this.mSpinnerTopBottoms = spinnerTopBottoms;
-        this.mSpinnerLength = spinnerLength;
-        this.mSpinnerColor = spinnerColor;
-        this.mBitmap = bitmap;
-    }
+//    public GetAzureDataAsyncTask(Context context, Spinner spinnerTopBottoms, Spinner spinnerLength, Spinner spinnerColor, Bitmap bitmap){
+//        this.mContext = context;
+//        this.mSpinnerTopBottoms = spinnerTopBottoms;
+//        this.mSpinnerLength = spinnerLength;
+//        this.mSpinnerColor = spinnerColor;
+//        this.mBitmap = bitmap;
+//    }
     public GetAzureDataAsyncTask(Context context, Spinner spinnerTopBottoms, Spinner spinnerLength, Spinner spinnerColor, byte[] bytes){
         this.mContext = context;
         this.mSpinnerTopBottoms = spinnerTopBottoms;
@@ -73,25 +73,22 @@ public class GetAzureDataAsyncTask extends AsyncTask<Void, Void, Void> {
 
             Project project = trainer.getProject(uuid);
 
-            // load test image
-//            byte[] testImage = ClothAddActivity.GetImage("/res/drawable", "test_image.png");
-
             byte[] testImage;
 
-            if (mBytes == null){
-                //앨범에서 선택한 옷 가져오기
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                mBitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);    //압축
-                byte[] byteArray = stream.toByteArray();
-                testImage = byteArray;
-            }else {
+//            if (mBytes == null){
+//                //앨범에서 선택한 옷 가져오기
+//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                mBitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);    //압축
+//                byte[] byteArray = stream.toByteArray();
+//                testImage = byteArray;
+//            }else {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(mBytes, 0, mBytes.length);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
                 byte[] byteArray = stream.toByteArray();
                 testImage = byteArray;
 //                testImage = mBytes;
-            }
+//            }
 
             Log.d(TAG, String.format("%d", testImage.length));
 
