@@ -1,7 +1,7 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.cloth;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -10,20 +10,22 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import com.pickth.dddd.smartcoordination.R;
 import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
@@ -31,8 +33,9 @@ import static android.app.Activity.RESULT_OK;
 public class ClothesFragment_HE extends Fragment implements View.OnClickListener{
     RecyclerView rvClothes;
     ClothesAdapter mAdapter;
+    ClothesDataManager manager;
+    ArrayList<ClothesItem> items = new ArrayList<>();
 
-    private RecyclerView.LayoutManager mLayoutManager;
     private Animation fab_open,fab_close; //fab을 활성화 및 비활성화에 따른 Animation
     private Boolean isFabOpen = false; //처음 +버튼의 fab을 클릭할 경우 fab1과 fab2를 visible
     private FloatingActionButton fab, fab1, fab2; //fragment_clothes.xml에서 만든 fab을 이용하기 위한 선언
@@ -65,13 +68,29 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
         fab1.setOnClickListener(this); //167줄인 onClick(View v)의 메
         fab2.setOnClickListener(this);
 
-        //옷장 탭
-        rvClothes = view.findViewById(R.id.rv_clothes);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        rvClothes.setLayoutManager(mLayoutManager);
-        rvClothes.scrollToPosition(0);
+        manager = new ClothesDataManager(getContext());
+        items = manager.getClothesItems();
+
+        // rvClothes를 연동할 adapter 설정
         mAdapter = new ClothesAdapter();
+        mAdapter.setClothesClickListener(new ClothesClickListener() {
+            @Override
+            public void onClick(ArrayList<ClothesItem> items) {
+                Log.d("rrrrr", "click");
+            }
+        });
+
+        //adapter에 item 추가하기
+        for(ClothesItem item: items)
+            mAdapter.addItem(item);
+
+        // 새로고침
+        mAdapter.notifyDataSetChanged();
+
+        // recycler view 설정
+        rvClothes = view.findViewById(R.id.rv_clothes_he);
         rvClothes.setAdapter(mAdapter);
+        rvClothes.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         return view;
     }
@@ -99,10 +118,10 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
      * 앨범에서 이미지 선택
      */
     private void doTakeAlbumAction() {
-        Intent intent = new Intent();
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_FROM_ALBUM);
+        intent.putExtra("crop", "true");
+        startActivityForResult(intent, PICK_FROM_ALBUM);
     }
 
     @Override
@@ -115,22 +134,17 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
             case PICK_FROM_CAMERA: {
                 Intent intent = new Intent(getContext(),ClothAddActivity.class);
                 intent.putExtra("imageUri", photoUri);
+                intent.putExtra("imageFilePath", imageFilePath);
                 startActivity(intent);
                 break;
             }
             case PICK_FROM_ALBUM: {
                 Uri uri = data.getData();
-                try {
-                    Intent intent = new Intent(getContext(),ClothAddActivity.class);
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    intent.putExtra("image",byteArray);
-                    startActivity(intent);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent(getContext(),ClothAddActivity.class);
+                intent.putExtra("imageUri", uri);
+                imageFilePath = getRealImagePath(uri);
+                intent.putExtra("imageFilePath", imageFilePath);
+                startActivity(intent);
                 break;
             }
         }
@@ -182,5 +196,21 @@ public class ClothesFragment_HE extends Fragment implements View.OnClickListener
             fab2.setClickable(true);
             isFabOpen = true;
         }
+    }
+
+    /**
+     * URI로 부터 실제 파일 경로를 가져온다.
+     * @param uri URI : URI 경로
+     * @return String : 실제 파일 경로
+     */
+    public String getRealImagePath(Uri uri) {
+        String res = null;
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContext().getContentResolver().query(uri, projection, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        res = cursor.getString(column_index);
+        cursor.close();
+        return res;
     }
 }

@@ -1,12 +1,11 @@
 package com.pickth.dddd.smartcoordination.add;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,10 +13,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
-import com.google.common.io.ByteStreams;
 import com.pickth.dddd.smartcoordination.R;
+import com.pickth.dddd.smartcoordination.cloth.ClothesDataManager;
+import com.pickth.dddd.smartcoordination.cloth.ClothesItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,8 +31,8 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
     Spinner spinnerTopBottoms, spinnerLength, spinnerSeason, spinnerColor;
     ArrayList<ColorItem> mColorList;
     ImageView imageView;
-
-    Bitmap bitmap;
+    Uri photoUri;
+    String photoString;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,44 +64,35 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
         //spinnerColor 초기화
         mColorList = new ArrayList<>();
         initList();
-
         spinnerColor = findViewById(R.id.spinner_color_clothAdd);
         ColorAdapter mAdapter = new ColorAdapter(this, mColorList);
         spinnerColor.setAdapter(mAdapter);
-
         spinnerColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ColorItem clickedItem = (ColorItem) parent.getItemAtPosition(position);
                 String clickedColorName = clickedItem.getColorName();
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) { }
         });
 
-        //ClothesFragment에서 옷의 uri나 byte[]를 가져와 그에 해당하는 GetAzureDataAsyncTask를 생성한다.
+        //ClothesFragment에서 옷의 uri를 가져와 GetAzureDataAsyncTask를 생성한다.
         Intent intent = getIntent();
-        Uri photoUri = intent.getParcelableExtra("imageUri");
-        byte[] arr = null;
-        arr = intent.getByteArrayExtra("image");
+        photoUri = intent.getParcelableExtra("imageUri");
+        try{ photoString = photoUri.toString(); }catch (Exception e){}
+        String imageFilePath = intent.getStringExtra("imageFilePath");
 
-        if (arr == null){
-            imageView = (ImageView) findViewById(R.id.iv_cloth_add);
-            imageView.setImageURI(photoUri);
-            try {
-                InputStream iStream =   getContentResolver().openInputStream(photoUri);
-                byte[] inputData = getBytes(iStream);
-                new GetAzureDataAsyncTask(getApplicationContext(), spinnerTopBottoms, spinnerLength, spinnerColor, inputData).execute();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else {
-            bitmap = BitmapFactory.decodeByteArray(arr, 0, arr.length);
-            imageView = (ImageView) findViewById(R.id.iv_cloth_add);
-            imageView.setImageBitmap(bitmap);
-            new GetAzureDataAsyncTask(getApplicationContext(), spinnerTopBottoms, spinnerLength, spinnerColor, bitmap).execute();
-        }
+        Log.d("imageFilePath", imageFilePath + "");
+        imageView = (ImageView) findViewById(R.id.iv_cloth_add);
+        imageView.setImageURI(photoUri);
+
+        try {
+            //Image Uri를 byte[]로 변경
+            InputStream iStream =   getContentResolver().openInputStream(photoUri);
+            byte[] inputData = getBytes(iStream);
+            new GetAzureDataAsyncTask(getApplicationContext(), spinnerTopBottoms, spinnerLength, spinnerColor, inputData).execute();
+        } catch (IOException e) { }
     }
 
     private void initList() {
@@ -131,25 +121,18 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_add :
-                Toast.makeText(this, spinnerTopBottoms.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+                String topBottoms = spinnerTopBottoms.getSelectedItem().toString();
+                String length = spinnerLength.getSelectedItem().toString();
+                String season = spinnerSeason.getSelectedItem().toString();
+                String color = spinnerColor.getSelectedItem().toString();
+
                 // 입력한 값을 파일에 저장하는 부분
-                //new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(title));
+                new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(photoString, season));
                 finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    public static byte[] GetImage(String folder, String fileName)
-    {
-        try {
-            return ByteStreams.toByteArray(ClothAddActivity.class.getResourceAsStream(folder + "/" + fileName));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public byte[] getBytes(InputStream inputStream) throws IOException {

@@ -1,12 +1,15 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.cloth;
+
+import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import android.content.Context;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class ClothesDataManager {  //메모 저장
+public class ClothesDataManager {  //저장
     private Context mContext;
     private ArrayList<ClothesItem> mItems = new ArrayList<>();
 
@@ -27,9 +30,10 @@ public class ClothesDataManager {  //메모 저장
             if(json == "") return mItems;
 
             Type type = new TypeToken<ArrayList<ClothesItem>>() {}.getType();
+//            Type type = TypeToken.getParameterized(ArrayList.class, ClothesItem.class).getType();
             mItems = new Gson().fromJson(json, type);
-        }
 
+        }
         return mItems;
     }
 
@@ -45,11 +49,22 @@ public class ClothesDataManager {  //메모 저장
     }
 
     /**
-     * 캘린더 아이템을 추가하는 메소드
+     * 아이템을 추가하는 메소드
      * @param item
      */
     public void addItem(ClothesItem item) {
         getClothesItems().add(item);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * 아이템을 삭제하는 메소드
+     * @param item
+     */
+    public void removeItem(ClothesItem item) {
+//        getClothesItems().remove(item);
+        mItems.remove(item);
+        Log.d("rrrrr", "remove");
         notifyDataSetChanged();
     }
 }
