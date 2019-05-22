@@ -71,6 +71,8 @@ public class DataAdapter extends BaseAdapter {
             dayViewHolder.img = (ImageView) convertView.findViewById(R.id.data_info_iv);
 
             convertView.setTag(dayViewHolder);
+
+            //convertView.setLayoutParams(new GridView.LayoutParams(getCellWidthDP()+getRestCellWidthDP(), getCellHeightDP()));
         }
         else
         {
@@ -90,5 +92,28 @@ public class DataAdapter extends BaseAdapter {
 
     }
 
+//    private int getCellWidthDP()
+//    {
+////      int width = mContext.getResources().getDisplayMetrics().widthPixels;
+//        int cellWidth = width -20;
+//
+//        return cellWidth;
+//    }
+//
+//    private int getRestCellWidthDP()
+//    {
+////      int width = mContext.getResources().getDisplayMetrics().widthPixels;
+//        int cellWidth = width%7;
+//
+//        return cellWidth;
+//    }
+//
+//    private int getCellHeightDP()
+//    {
+////      int height = mContext.getResources().getDisplayMetrics().widthPixels;
+//        int cellHeight = height - 20;
+//
+//        return cellHeight;
+//}
 
 }

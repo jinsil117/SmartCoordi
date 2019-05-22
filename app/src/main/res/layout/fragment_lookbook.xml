@@ -16,6 +16,12 @@
     </android.support.v7.widget.RecyclerView>
 
     //갤러리 fab
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="옷을 등록해 주세요"
+        android:layout_gravity="bottom"
+        android:textSize="20dp"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/albumfab"
         android:layout_width="wrap_content"
