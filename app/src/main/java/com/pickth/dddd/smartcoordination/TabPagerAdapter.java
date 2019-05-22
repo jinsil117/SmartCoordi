@@ -5,6 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.pickth.dddd.smartcoordination.cloth.ClothesFragment;
+import com.pickth.dddd.smartcoordination.history.HistoryFragment_dev;
+import com.pickth.dddd.smartcoordination.lookbook.LookbookFragment;
 
 public class TabPagerAdapter extends FragmentStatePagerAdapter {
     // Count number of tabs

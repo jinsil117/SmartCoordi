@@ -1,4 +1,4 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.history;
 
 
 import android.graphics.Bitmap;

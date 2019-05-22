@@ -1,4 +1,4 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.history;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,13 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +21,11 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.pickth.dddd.smartcoordination.ChangeImage;
+import com.pickth.dddd.smartcoordination.DBHelper;
+import com.pickth.dddd.smartcoordination.R;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,7 +33,7 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class HistoryFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class HistoryFragment_dev extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     private TextView tv;
     private Button beforeBTN, afterBTN;
@@ -41,13 +45,14 @@ public class HistoryFragment extends Fragment implements View.OnClickListener, A
     String Day;
     int width, height;
     DisplayMetrics dm;
-    private static final int PICK_FROM_CAMERA = 0; //사진을 촬영하고 찍힌 이미지를 처리하는 부분
-    private Uri mImageCaptureUri; //크롭된 이미지에 대한 Uri(Uniform Resource Identifier = 통합 자원 식별자)
-    DBHelper DBHelper;
+    com.pickth.dddd.smartcoordination.DBHelper DBHelper;
     SQLiteDatabase db;
     int position;
     ChangeImage changeImage;
     Bitmap bm;
+    private int roadPk; //DB에서 pk를 불러오기 위한 변수: 년도+월+일
+    private int savePk; //DB에 pk를 저장하기 위한 변수
+    DayInfo selectedDay;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,44 +120,41 @@ public class HistoryFragment extends Fragment implements View.OnClickListener, A
                 day = new DayInfo(); //인스턴스 생성
 
                 //년,월,일을 합쳐 하나의 키값으로 생성
-                String historyNum1 = ""+Year+""+Month+""+i;
-                int historyNum = Integer.parseInt(historyNum1);
-//
-//                Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM historyTBL WHERE num=" + historyNum, null);
-//                if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
-//                    Log.i("DB 검색중: ",""+historyNum);
-//                    long blobStart = 1; //blob 시작
-//                    long blobLen = 1; //blob 길이
-//                    int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
-//                    byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
-//
-//                    while (blobSize > 0) {
-//                        blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
-//                        blobSize -= blobLen;
-//
-//                        Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM historyTBL;", null);
-//                        if (blobCursor.moveToNext()) {
-//                            byte[] barr = blobCursor.getBlob(0);
-//                            if (barr != null) {
-//                                System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
-//                            }
-//                            blobCursor.close();
-//
-//                            blobStart += blobLen;
-//                        }
-//
-//                    }
-//                    Bitmap bm = changeImage.getImage(bytes);
-//                    day.setBm(bm);
-//                    bm = null;
-//                    bytes = null;
-//                }
-//                sizeCursor.close();
-//                db.close();
+                String historyNum = ""+Year+""+Month+""+i;
+                roadPk = Integer.parseInt(historyNum);
+
+                Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM historyTBL WHERE num=" + roadPk, null);
+                if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+                    long blobStart = 1; //blob 시작
+                    long blobLen = 1; //blob 길이
+                    int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+                    byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+
+                    while (blobSize > 0) {
+                        blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+                        blobSize -= blobLen;
+
+                        Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM historyTBL WHERE num = " + roadPk, null);
+                        if (blobCursor.moveToNext()) {
+                            byte[] barr = blobCursor.getBlob(0);
+                            if (barr != null) {
+                                System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+                            }
+                            blobCursor.close();
+
+                            blobStart += blobLen;
+                        }
+
+                    }
+                    Bitmap bm = changeImage.getBitmap(bytes);
+                    day.setBm(bm);
+                }
+                sizeCursor.close();
+                db.close();
 
                 //날짜, 이미지 저장
                 day.setDay(Integer.toString(i));
-                day.setHistoryNum(historyNum);
+                day.setHistoryNum(roadPk);
                 DayList.add(day);
             }catch (Exception e) {
             }
@@ -184,6 +186,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener, A
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) { //날짜 선택
         DayInfo dayInfo = DayList.get(position); //사용자가 선택한 날짜 호출
+        selectedDay = DayList.get(position);
+        selectedDay.img = (ImageView)view.findViewById(R.id.day_img);
         Day = dayInfo.getDay();
         this.position = position;
         if (Day.equals("")) { //만약 공백인 날짜를 선택하면
@@ -209,12 +213,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener, A
                             intent.setType("image/*");
                             intent.setAction(Intent.ACTION_GET_CONTENT);
                             startActivityForResult(intent, 1);
-
-                            // 사진을 히스토리에 보여줌
-                            //adapter.notifyDataSetChanged();
-                            dayInfo.img = (ImageView)view.findViewById(R.id.day_img);
-                            dayInfo.img.setImageBitmap(bm);
-
                             bm = null;
                         } catch (Exception e) {
 
@@ -225,6 +223,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener, A
                         db.execSQL("DELETE FROM historyTBL WHERE num = " + key);
                         db.close();
 
+                        selectedDay.img.setImageBitmap(null);
                     }
                 }
             });
@@ -239,31 +238,43 @@ public class HistoryFragment extends Fragment implements View.OnClickListener, A
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 try {
-                    // 선택한 이미지를 비트맵으로 표현하기
+                    db = DBHelper.getWritableDatabase();
+                    String historyNum1 = ""+Year+""+Month+""+Day;
+                    savePk = Integer.parseInt(historyNum1);
                     InputStream in = getActivity().getContentResolver().openInputStream(data.getData()); //이미지를 불러온다
+
+                    Matrix rotateMatrix = new Matrix();
+                    rotateMatrix.postRotate(90);
+
                     bm = BitmapFactory.decodeStream(in); //이미지를 Bitmap 변수에 저장
-//                    byte[] bytes = changeImage.getBytes(bm); //Bitmap 형식을 byte형식으로 변환 및 저장
-//                    db = DBHelper.getWritableDatabase();
-//                    String historyNum1 = ""+Year+""+Month+""+Day;
-//
-//                    //이미지 정보를 db에 저장
-//                    SQLiteStatement p = db.compileStatement("INSERT INTO historyTBL values(?,?,?,?,?);");
-//                    p.bindLong(1,Integer.parseInt(historyNum1));
-//                    p.bindString(2, Integer.toString(Year));
-//                    p.bindString(3, Integer.toString(Month)); //12월이면 11로 저장됨
-//                    p.bindString(4, Day);
-//                    p.bindBlob(5, bytes);
-//                    p.execute();
-//                    db.close();
+                    Bitmap rotateBitmap = Bitmap.createBitmap(bm,0,0,bm.getWidth(),bm.getHeight(),rotateMatrix,false);
+                    byte[] bytes = changeImage.getBytes(rotateBitmap); //Bitmap 형식을 byte형식으로 변환 및 저장
+
+                    Cursor checkCursor = db.rawQuery("SELECT img FROM historyTBL WHERE num ="+savePk,null);
+                    if (checkCursor.moveToNext()){ //해당 날짜에 이미 사진이 존재
+                        SQLiteStatement p = db.compileStatement("UPDATE historyTBL SET img=? WHERE num = "+savePk);
+                        p.bindBlob(1,bytes);
+                        p.execute();
+                    }
+                    else {
+                        //이미지 정보를 db에 저장
+                        SQLiteStatement p = db.compileStatement("INSERT INTO historyTBL values(?,?,?,?,?);");
+                        p.bindLong(1, savePk);
+                        p.bindString(2, Integer.toString(Year));
+                        p.bindString(3, Integer.toString(Month)); //12월이면 11로 저장됨
+                        p.bindString(4, Day);
+                        p.bindBlob(5, bytes);
+                        p.execute();
+                    }
+                    db.close();
                     in.close();
+
+                    selectedDay.img.setImageBitmap(rotateBitmap);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        }
-
-        if(requestCode == 2){ //사진 삭제
-
         }
 
     }
@@ -273,5 +284,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener, A
         adapter = new CalendarAdapter(getActivity(), R.layout.fragment_history_day, DayList, width, height);
         gv.setAdapter(adapter);
     }
+
 
 }
