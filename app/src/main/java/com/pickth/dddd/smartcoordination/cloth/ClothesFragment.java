@@ -120,7 +120,7 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
     private void doTakeAlbumAction() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         intent.setType("image/*");
-        intent.putExtra("crop", "true");
+//        intent.putExtra("crop", "true");
         startActivityForResult(intent, PICK_FROM_ALBUM);
     }
 

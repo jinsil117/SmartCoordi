@@ -1,6 +1,8 @@
 package com.pickth.dddd.smartcoordination.add;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import com.pickth.dddd.smartcoordination.DBHelper;
 import com.pickth.dddd.smartcoordination.R;
 import com.pickth.dddd.smartcoordination.cloth.ClothesDataManager;
 import com.pickth.dddd.smartcoordination.cloth.ClothesItem;
@@ -34,10 +37,18 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
     Uri photoUri;
     String photoString;
 
+    byte[] inputData;
+
+    SQLiteDatabase db;
+    DBHelper DBHelper;
+    Bitmap bm;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cloth_add);
+        DBHelper = new DBHelper(getApplicationContext());
 
         //상의와 하의 중에 선택하는 스피너 연결
         spinnerTopBottoms = (Spinner) findViewById(R.id.spinner_topBottoms_clothAdd);
@@ -90,7 +101,7 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
         try {
             //Image Uri를 byte[]로 변경
             InputStream iStream =   getContentResolver().openInputStream(photoUri);
-            byte[] inputData = getBytes(iStream);
+            inputData = getBytes(iStream);
             new GetAzureDataAsyncTask(getApplicationContext(), spinnerTopBottoms, spinnerLength, spinnerColor, inputData).execute();
         } catch (IOException e) { }
     }
@@ -127,7 +138,7 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
                 String color = spinnerColor.getSelectedItem().toString();
 
                 // 입력한 값을 파일에 저장하는 부분
-                new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(photoString, season));
+                new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(topBottoms, length, season, color, inputData));
                 finish();
                 return true;
             default:
