@@ -14,7 +14,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void onCreate(SQLiteDatabase db){
-        db.execSQL("CREATE TABLE clothesTBL(num INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, length TEXT, season TEXT, color TEXT, img BLOB)"); //옷 정보 저장 테이블
+        db.execSQL("CREATE TABLE clothesTBL(num INTEGER PRIMARY KEY AUTOINCREMENT, topBottoms TEXT, length TEXT, season TEXT, color TEXT, img BLOB)"); //옷 정보 저장 테이블
         db.execSQL("CREATE TABLE shoesTBL(num INTEGER PRIMARY KEY AUTOINCREMENT, category TEXT, length TEXT, season TEXT, color TEXT, img BLOB)"); //신발 정보 저장 테이블
         db.execSQL("CREATE TABLE historyTBL (num INTEGER PRIMARY KEY, year TEXT, month TEXT, day TEXT, img BLOB);"); //히스토리 사진 저장 테이블
     }

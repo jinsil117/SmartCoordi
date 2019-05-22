@@ -1,6 +1,7 @@
 package com.pickth.dddd.smartcoordination.cloth;
 
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -40,6 +41,15 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return items.size();
     }
 
+    public Object getItem(int position)
+    {
+        return items.get(position);
+    }
+
+    public void setImage(int position, byte[] bytes){
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
     public void addItem(ClothesItem item) {
         items.add(item);
     }
@@ -66,12 +76,14 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             manager = new ClothesDataManager(itemView.getContext());
             items = manager.getClothesItems();
             try {
-                ivCloth.setImageURI(Uri.parse(items.get(position).getmImage()));
+                byte[] bytes = items.get(position).getByte();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                ivCloth.setImageBitmap(bitmap);
                 tvSeason.setText(items.get(position).getmSeason());
             }catch (Exception e){}
 
 
-            // 아이템을 눌렀을 때 클릭리스너. CalendarActivity에서 만든 클릭리스너를 CalendarAdapter에 넘겨서 여기서 사용한다.
+            // 아이템을 눌렀을 때 클릭리스너.
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

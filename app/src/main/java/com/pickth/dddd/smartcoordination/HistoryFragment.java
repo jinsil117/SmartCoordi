@@ -143,7 +143,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener, A
 //
 //                    }
 //                    Bitmap bm = changeImage.getImage(bytes);
-//                    day.setBm(bm);
+//                    day.setByte(bm);
 //                    bm = null;
 //                    bytes = null;
 //                }
