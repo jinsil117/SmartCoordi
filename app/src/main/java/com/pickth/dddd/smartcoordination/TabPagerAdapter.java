@@ -24,8 +24,8 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 CoordiFragment laundryFragment = new CoordiFragment();
                 return laundryFragment;
             case 1:
-                ClothesFragment clothesFragmentHE = new ClothesFragment();
-                return clothesFragmentHE;
+                ClothesFragment clothesFragment = new ClothesFragment();
+                return clothesFragment;
             case 2:
                 LookbookFragment lookbookFragment = new LookbookFragment();
                 return lookbookFragment;
