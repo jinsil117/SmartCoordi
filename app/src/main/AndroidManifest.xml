@@ -32,14 +32,7 @@
         </provider>
 
         <activity
-            android:name=".CutOutActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat" />
-        <activity
-            android:name="com.pickth.dddd.smartcoordination.IntroActivity"
-            android:label="@string/intro_label"
             android:theme="@style/Base.Theme.AppCompat" />
         <activity android:name=".MainActivity">
             <intent-filter>
