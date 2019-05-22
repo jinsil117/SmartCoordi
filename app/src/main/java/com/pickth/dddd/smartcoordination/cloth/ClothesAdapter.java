@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,14 +81,16 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 @Override
                 public void onClick(View view) {
                     listener.onClick(items);
+                    Log.d("cccc","one");
                 }
             });
 
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    manager.removeItem(items.get(position));
-                    onBindViewHolder(ClothesViewHolder.this,position);
+//                    manager.removeItem(items.get(position));
+//                    onBindViewHolder(ClothesViewHolder.this,position);
+                    Log.d("cccc","long");
                     return false;
                 }
             });

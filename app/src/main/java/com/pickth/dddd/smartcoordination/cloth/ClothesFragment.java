@@ -72,7 +72,6 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
         mAdapter.setClothesClickListener(new ClothesClickListener() {
             @Override
             public void onClick(ArrayList<ClothesItem> items) {
-                Log.d("rrrrr", "click");
             }
         });
 
