@@ -1,22 +1,20 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.history;
 
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.pickth.dddd.smartcoordination.DBHelper;
+import com.pickth.dddd.smartcoordination.R;
 
 import java.util.ArrayList;
 

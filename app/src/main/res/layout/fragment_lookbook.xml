@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/clothes"
     android:orientation="vertical"
-    android:id="@+id/lookbook"
-    tools:context="com.pickth.dddd.smartcoordination.MainActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/iv_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:overScrollMode="never"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="2dp">
+
+    </android.support.v7.widget.RecyclerView>
 
     //갤러리 fab
     <android.support.design.widget.FloatingActionButton
@@ -26,4 +28,4 @@
         app:pressedTranslationZ="12dp"
         android:src="@drawable/ic_add_black_24dp"/>
 
-</LinearLayout>
+</FrameLayout>

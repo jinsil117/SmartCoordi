@@ -1,4 +1,4 @@
-package com.pickth.dddd.smartcoordination;
+package com.pickth.dddd.smartcoordination.lookbook;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,18 +8,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.pickth.dddd.smartcoordination.R;
+
 import java.io.InputStream;
 
 import static android.app.Activity.RESULT_OK;
 
-public class LookbookFragment extends Fragment {
-    ImageView imageView; //갤러리에서 선택한 이미지를 보여주기 위한 것
+public class LookbookFragment extends Fragment
+{
+    RecyclerView imageView; //갤러리에서 선택한 이미지를 보여주기 위한 것
     FloatingActionButton album; //xml에서 albumfab과 연결하기 위한 것
 
     @Override
@@ -33,20 +37,13 @@ public class LookbookFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_lookbook,container,false);
 
         //룩북 탭
-        imageView = (ImageView)view.findViewById(R.id.iv_view);
+        imageView = view.findViewById(R.id.iv_view);
 
         album = (FloatingActionButton) view.findViewById(R.id.albumfab);
         album.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(); //이미지 불러오기
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                //intent.setType("image/*");
-                intent.setType(android.provider.MediaStore.Images.Media.CONTENT_TYPE);
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); //갤러리에서 여러 이미지를 선택
-                startActivityForResult(intent, 1); //시작할 액티비티를 통해 어떠한 값을 받을 것을 기대하고 액티비티를 시작
-                //
+
             }
         });
 
@@ -63,7 +60,7 @@ public class LookbookFragment extends Fragment {
                     Bitmap img = BitmapFactory.decodeStream(in);
                     in.close();
                     // 이미지 표시
-                    imageView.setImageBitmap(img);
+                    //imageView.setImageBitmap(img);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

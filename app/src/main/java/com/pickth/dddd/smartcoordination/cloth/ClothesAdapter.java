@@ -2,6 +2,7 @@ package com.pickth.dddd.smartcoordination.cloth;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -39,15 +40,6 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemCount() {
         return items.size();
-    }
-
-    public Object getItem(int position)
-    {
-        return items.get(position);
-    }
-
-    public void setImage(int position, byte[] bytes){
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
     public void addItem(ClothesItem item) {

@@ -1,7 +1,5 @@
 package com.pickth.dddd.smartcoordination.cloth;
 
-import android.graphics.Bitmap;
-
 public class ClothesItem {
     String mImage;
     String mTopBottoms, mLength, mSeason, mColor;

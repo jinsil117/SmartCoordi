@@ -43,6 +43,7 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
     DBHelper DBHelper;
     Bitmap bm;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
