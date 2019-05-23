@@ -18,19 +18,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
 import com.pickth.dddd.smartcoordination.R;
 import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import static android.app.Activity.RESULT_OK;
 
 public class ClothesFragment extends Fragment implements View.OnClickListener{
+
     RecyclerView rvClothes;
     ClothesAdapter mAdapter;
     ClothesDataManager manager;
@@ -39,12 +37,10 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
     private Animation fab_open,fab_close; //fab을 활성화 및 비활성화에 따른 Animation
     private Boolean isFabOpen = false; //처음 +버튼의 fab을 클릭할 경우 fab1과 fab2를 visible
     private FloatingActionButton fab, fab1, fab2; //fragment_clothes.xml에서 만든 fab을 이용하기 위한 선언
-
     private static final int PICK_FROM_CAMERA = 2; //사진을 촬영하고 찍힌 이미지를 이미지뷰에
     private static final int PICK_FROM_ALBUM = 1; //앨범에서 사진을 고르고 이미지를 이미지뷰에
 
     private String imageFilePath;
-
     private Uri photoUri;
 
     @Override
@@ -76,7 +72,6 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
         mAdapter.setClothesClickListener(new ClothesClickListener() {
             @Override
             public void onClick(ArrayList<ClothesItem> items) {
-                Log.d("rrrrr", "click");
             }
         });
 
@@ -213,4 +208,5 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
         cursor.close();
         return res;
     }
+
 }

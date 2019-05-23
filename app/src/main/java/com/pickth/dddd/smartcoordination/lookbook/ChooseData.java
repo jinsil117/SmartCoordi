@@ -6,8 +6,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -34,12 +37,14 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
     dataItem dataItem;
     ArrayList<dataItem> DI;
     GridView gv;
+
     CheckBox checkBox;
 
     ChangeImage changeImage = new ChangeImage();
     public ChooseData(Context context){
         this.context = context;
         state=0; //1=상의. 2=하의
+        dbHelper = new DBHelper(context);
     }
 
     public void callFunction(){
@@ -132,10 +137,15 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
     }
 
     protected void saveTop(){
-        Cursor numCursor = db.rawQuery("SELECT * FROM clothTBL WHERE category= 'top'",null);
+        db = dbHelper.getReadableDatabase();
+        int num;
+        DI = new ArrayList<>();
+        Cursor numCursor = db.rawQuery("SELECT num FROM clothesTBL WHERE topBottoms= 'Top';",null);
 
         while (numCursor.moveToNext()){
-            Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothTBL", null);
+            num = numCursor.getInt(0);
+
+            Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE num = "+num, null);
             if (sizeCursor.moveToNext()) {
                 long blobStart = 1; //blob 시작
                 long blobLen = 1; //blob 길이
@@ -146,7 +156,7 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
                     blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
                     blobSize -= blobLen;
 
-                    Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM historyTBL;", null);
+                    Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num = "+num, null);
                     if (blobCursor.moveToNext()) {
                         byte[] barr = blobCursor.getBlob(0);
                         if (barr != null) {
@@ -158,7 +168,6 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
                     }
 
                 }
-                int num = numCursor.getInt(0);
                 Bitmap bm = changeImage.getBitmap(bytes);
                 dataItem = new dataItem(num,bm);
                 DI.add(dataItem);
@@ -171,10 +180,15 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
     }
 
     protected void saveBottom(){
-        Cursor numCursor = db.rawQuery("SELECT * FROM clothTBL WHERE category= 'bottom'",null);
+        db = dbHelper.getReadableDatabase();
+        int num;
+        DI = new ArrayList<>();
+        Cursor numCursor = db.rawQuery("SELECT num FROM clothesTBL WHERE topBottoms= 'Bottoms';",null);
 
         while (numCursor.moveToNext()){
-            Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothTBL", null);
+            num = numCursor.getInt(0);
+
+            Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE num = "+num, null);
             if (sizeCursor.moveToNext()) {
                 long blobStart = 1; //blob 시작
                 long blobLen = 1; //blob 길이
@@ -185,7 +199,7 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
                     blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
                     blobSize -= blobLen;
 
-                    Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM historyTBL;", null);
+                    Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num = "+num, null);
                     if (blobCursor.moveToNext()) {
                         byte[] barr = blobCursor.getBlob(0);
                         if (barr != null) {
@@ -197,7 +211,6 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
                     }
 
                 }
-                int num = numCursor.getInt(0);
                 Bitmap bm = changeImage.getBitmap(bytes);
                 dataItem = new dataItem(num,bm);
                 DI.add(dataItem);
