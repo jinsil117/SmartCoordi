@@ -74,16 +74,16 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
 //        choose.setOnClickListener(this);
 //        cancel.setOnClickListener(this);
 
-        if(state==1){
-            top.setEnabled(false);
-            bt.setEnabled(true);
-        }else if(state == 2) {
-            top.setEnabled(true);
-            bt.setEnabled(false);
-        }else {
-            top.setEnabled(true);
-            bt.setEnabled(true);
-        }
+//        if(state==1){
+//            top.setEnabled(false);
+//            bt.setEnabled(true);
+//        }else if(state == 2) {
+//            top.setEnabled(true);
+//            bt.setEnabled(false);
+//        }else {
+//            top.setEnabled(true);
+//            bt.setEnabled(true);
+//        }
 
         top.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +129,9 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
         });
     }
 
+    public void checkState(){
+
+    }
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         dataItem dataItem1 = DI.get(position);
