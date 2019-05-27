@@ -49,14 +49,6 @@ public class LookbookFragment extends Fragment
 
 
         ChooseData chooseData = new ChooseData(getContext());
-        WindowManager.LayoutParams wm = chooseData.getWindow().getAttributes();  //다이얼로그의 높이 너비 설정하기위해
-
-        dm = getResources().getDisplayMetrics(); //디스플레이
-        int width = dm.widthPixels; //get display width
-        int height = dm.heightPixels; //get display height
-        wm.width = width / 2;  //화면 너비의 절반
-        wm.height = height / 2;  //화면 높이의 절반
-        wm.copyFrom(chooseData.getWindow().getAttributes());  //여기서 설정한값을 그대로 다이얼로그에 넣겠다는의미
         album = (FloatingActionButton) view.findViewById(R.id.albumfab);
         album.setOnClickListener(new View.OnClickListener() {
             @Override
