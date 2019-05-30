@@ -1,24 +1,30 @@
 package com.pickth.dddd.smartcoordination.cloth;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.pickth.dddd.smartcoordination.DBHelper;
 import com.pickth.dddd.smartcoordination.R;
 
 import java.util.ArrayList;
 
+import libs.mjn.prettydialog.PrettyDialog;
+import libs.mjn.prettydialog.PrettyDialogCallback;
+
 public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ClothesClickListener mClickListener;
     ArrayList<ClothesItem> items = new ArrayList<>();
+
+    DBHelper DBHelper;
+    SQLiteDatabase db;
 
     @NonNull
     @Override
@@ -65,6 +71,7 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void onBind(final ClothesClickListener listener, int position) {
+            DBHelper = new DBHelper(itemView.getContext());
             // 아이템들, 데이터 매니저 초기화
             manager = new ClothesDataManager(itemView.getContext());
             items = manager.getClothesItems();
@@ -75,22 +82,60 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 tvSeason.setText(items.get(position).getmSeason());
             }catch (Exception e){}
 
-
             // 아이템을 눌렀을 때 클릭리스너.
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     listener.onClick(items);
-                    Log.d("cccc","one");
+                    PrettyDialog pDialog = new PrettyDialog(itemView.getContext());
+                    pDialog
+//                  .setTitle("PrettyDialog Title")
+//                  .setMessage("PrettyDialog Message")
+                    .setIcon(R.drawable.pdlg_icon_success)
+                    .setIconTint(R.color.colorPurple1)
+                    .addButton(
+                            "Edit",     // button text
+                            R.color.pdlg_color_white,  // button text color
+                            R.color.colorPurple2,  // button background color
+                            new PrettyDialogCallback() {  // button OnClick listener
+                                @Override
+                                public void onClick() {
+                                    // Do what you gotta do
+
+                                    pDialog.dismiss();
+                                }
+                            }
+                    )
+                    .addButton(
+                            "Delete",
+                            R.color.pdlg_color_white,
+                            R.color.colorPurple3,
+                            new PrettyDialogCallback() {
+                                @Override
+                                public void onClick() {
+                                    manager.removeItem(position);
+                                    pDialog.dismiss();
+                                }
+                            }
+                    )
+                    .addButton(
+                            "Cancel",
+                            R.color.pdlg_color_black,
+                            R.color.pdlg_color_gray,
+                            new PrettyDialogCallback() {
+                                @Override
+                                public void onClick() {
+                                    pDialog.dismiss();
+                                }
+                            }
+                    )
+                    .show();
                 }
             });
 
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-//                    manager.removeItem(items.get(position));
-//                    onBindViewHolder(ClothesViewHolder.this,position);
-                    Log.d("cccc","long");
                     return false;
                 }
             });

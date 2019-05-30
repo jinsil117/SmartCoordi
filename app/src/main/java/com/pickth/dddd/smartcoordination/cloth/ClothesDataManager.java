@@ -109,12 +109,18 @@ public class ClothesDataManager {  //저장
 
     /**
      * 아이템을 삭제하는 메소드
-     * @param item
+     * @param position
      */
-    public void removeItem(ClothesItem item) {
-        getClothesItems().remove(item);
-        mItems.remove(item);
-        Log.d("rrrrr", "remove");
+    public void removeItem(int position) {
+        db = DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL LIMIT " + position +",1;", null);
+        cursor.moveToNext();
+        int num = cursor.getInt(0);
+        db = DBHelper.getWritableDatabase();
+        //이미지를 db에서 삭제
+        SQLiteStatement p = db.compileStatement("DELETE FROM clothesTBL WHERE num = " + num);
+        p.execute();
+        db.close();
         notifyDataSetChanged();
     }
 }
