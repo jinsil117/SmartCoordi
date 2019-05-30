@@ -135,9 +135,11 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
                 String topBottoms = spinnerTopBottoms.getSelectedItem().toString();
                 String length = spinnerLength.getSelectedItem().toString();
                 String season = spinnerSeason.getSelectedItem().toString();
-                String color = spinnerColor.getSelectedItem().toString();
+                String color;
+                int c = spinnerColor.getSelectedItemPosition(); //brown == 0
+                color = whatColor(c);
 
-                // 입력한 값을 파일에 저장하는 부분
+                // 입력한 값을 DB에 저장하는 부분
                 new ClothesDataManager(ClothAddActivity.this).addItem(new ClothesItem(topBottoms, length, season, color, inputData));
                 finish();
                 return true;
@@ -156,6 +158,38 @@ public class ClothAddActivity extends AppCompatActivity implements AdapterView.O
             byteBuffer.write(buffer, 0, len);
         }
         return byteBuffer.toByteArray();
+    }
+
+    public String whatColor(int c){
+        switch (c) {
+            case 0:
+                return "brown";
+            case 1:
+                return "black";
+            case 2:
+                return "yellow";
+            case 3:
+                return "pink";
+            case 4:
+                return "green";
+            case 5:
+                return "sky-blue";
+            case 6:
+                return "gray";
+            case 7:
+                return "white";
+            case 8:
+                return "navy";
+            case 9:
+                return "purple";
+            case 10:
+                return "red";
+            case 11:
+                return "charcoal";
+            case 12:
+                return "blue";
+        }
+        return "no-way";
     }
 
     @Override

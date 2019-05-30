@@ -94,12 +94,15 @@ public class CoordiFragment extends Fragment implements View.OnClickListener {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         setGetWeatherBtn();
+                        CoordiRecommend();
                         break;
                     case MotionEvent.ACTION_MOVE:
                         setGetWeatherBtn();
+                        CoordiRecommend();
                         break;
                     case MotionEvent.ACTION_UP:
                         setGetWeatherBtn();
+                        CoordiRecommend();
                         break;
                     default:
                         break;
@@ -121,34 +124,246 @@ public class CoordiFragment extends Fragment implements View.OnClickListener {
     //코디추천을 해주는 메소드
     public void CoordiRecommend() {
         tmp = (int)Double.parseDouble(tem.getText().toString());
-            if (tmp <= 5) {
-                db = DBHelper.getReadableDatabase();
-                Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL WHERE season = winter;", null);
-
-                //5도 이하일때 옷 선택하는 DB
-                //SELECT 열리스트 FROM 테이블리스트 WHERE 조건;
-                //SELECT *FROM 옷 WHERE 계절 BETWEEN 가을 AND 겨울;
-                //SELECT *FROM 옷 WHERE 계절 = 겨울
-                //SELECT *FROM 옷 WHERE 계절 = 겨울 IN (SELECT 겨울 FROM 상의 WHERE
-            } else if (5 < tmp && tmp <= 9) {
-                //5도초과 9도이하일때 옷 선택하는 DB
-
-            } else if (9 < tmp && tmp <= 11) {
-                //9도초과 11도이하일때 옷 선택하는 DB
-
-            } else if (11 < tmp && tmp <= 16) {
-                //11도초과 16도이하일때 옷 선택하는 DB
-
-            } else if (16 < tmp && tmp <= 19) {
-                //16도초과 19도이하일때 옷 선택하는 DB
-
-//            } else if (19 < tmp && tmp <= 20) {
-//                //19도초과 22도이하일때 옷 선택하는 DB
-
-            } else if (19 < tmp && tmp < 27) {
-                //22도초과 27도미만일때 옷 선택하는 DB
+            if (tmp < 12) { //겨울
+                //12도 미만일때 옷 선택하는 DB
                 //Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL WHERE season = summer IN (SELECT * From summer WHERE topBottoms = top);", null);
                 //Cursor cursor2 = db.rawQuery("SELECT * FROM clothesTBL WHERE season = summer IN (SELECT * From summer WHERE topBottoms = Bottoms);", null);
+                SQLiteDatabase db = DBHelper.getReadableDatabase();
+                Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL WHERE season = 'winter' AND topBottoms='Top';", null);
+                int count = cursor.getCount();
+                int random = (int) (Math.random() * count);
+                Log.d("cccc",count+" count, "+random+" ran");
+
+                try { //db에서 옷을 가져옴
+
+                    DBHelper = new DBHelper(getContext());
+                    db = DBHelper.getReadableDatabase();
+
+                    Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE season = 'winter' AND topBottoms='Top' LIMIT " + random + ",1;", null);
+//                    Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=2;", null);
+
+                    if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+                        long blobStart = 1; //blob 시작
+                        long blobLen = 1; //blob 길이
+                        int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+                        byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+                        while (blobSize > 0) {
+                            blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+                            blobSize -= blobLen;
+
+                            Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ")  FROM clothesTBL WHERE season = 'winter' AND topBottoms='Top' LIMIT " + random + ",1;", null);
+//                            Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num=2", null);
+                            if (blobCursor.moveToNext()) {
+                                byte[] barr = blobCursor.getBlob(0);
+                                if (barr != null) {
+                                    System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+                                }
+                                blobStart += blobLen;
+                                blobCursor.close();
+                            }
+                        }
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        top_clothes.setImageBitmap(bitmap);
+                    }
+                    sizeCursor.close();
+                } catch (Exception e) {
+                }
+
+                SQLiteDatabase db2 = DBHelper.getReadableDatabase();
+                Cursor cursor2 = db2.rawQuery("SELECT img FROM clothesTBL WHERE season = 'winter' AND topBottoms='Bottoms';", null);
+                int count2 = cursor2.getCount();
+                int random2 = (int) (Math.random() * count2);
+                try { //db에서 옷을 가져옴
+                    Cursor sizeCursor = db2.rawQuery("SELECT length(img)  FROM clothesTBL WHERE season = 'winter' AND topBottoms='Bottoms' LIMIT " + random2 + ",1;", null);
+//                    Cursor sizeCursor = db2.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=6", null);
+                    if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+                        long blobStart = 1; //blob 시작
+                        long blobLen = 1; //blob 길이
+                        int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+                        byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+                        while (blobSize > 0) {
+                            blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+                            blobSize -= blobLen;
+
+                            Cursor blobCursor = db2.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE season = 'winter' AND topBottoms='Bottoms' LIMIT " + random2 + ",1;", null);
+//                            Cursor blobCursor = db2.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num=6", null);
+                            if (blobCursor.moveToNext()) {
+                                byte[] barr = blobCursor.getBlob(0);
+                                if (barr != null) {
+                                    System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+                                }
+                                blobStart += blobLen;
+                                blobCursor.close();
+                            }
+                        }
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        bottom_cloths.setImageBitmap(bitmap);
+                    }
+                    sizeCursor.close();
+                    db2.close();
+                } catch (Exception e) {
+                }
+            } else if (12 <= tmp && tmp <=16 ) {
+                //12도이상 16도이하일때 옷 선택하는 DB
+                //가을
+                SQLiteDatabase db = DBHelper.getReadableDatabase();
+                Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL WHERE season = 'fall' AND topBottoms='Top';", null);
+                int count = cursor.getCount();
+                int random = (int) (Math.random() * count);
+                Log.d("cccc",count+" count, "+random+" ran");
+
+                try { //db에서 옷을 가져옴
+
+                    DBHelper = new DBHelper(getContext());
+                    db = DBHelper.getReadableDatabase();
+
+                    Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE season = 'fall' AND topBottoms='Top' LIMIT " + random + ",1;", null);
+//                    Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=2;", null);
+
+                    if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+                        long blobStart = 1; //blob 시작
+                        long blobLen = 1; //blob 길이
+                        int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+                        byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+                        while (blobSize > 0) {
+                            blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+                            blobSize -= blobLen;
+
+                            Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ")  FROM clothesTBL WHERE season = 'fall' AND topBottoms='Top' LIMIT " + random + ",1;", null);
+//                            Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num=2", null);
+                            if (blobCursor.moveToNext()) {
+                                byte[] barr = blobCursor.getBlob(0);
+                                if (barr != null) {
+                                    System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+                                }
+                                blobStart += blobLen;
+                                blobCursor.close();
+                            }
+                        }
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        top_clothes.setImageBitmap(bitmap);
+                    }
+                    sizeCursor.close();
+                } catch (Exception e) {
+
+                }
+                SQLiteDatabase db2 = DBHelper.getReadableDatabase();
+                Cursor cursor2 = db2.rawQuery("SELECT img FROM clothesTBL WHERE season = 'fall' AND topBottoms='Bottoms';", null);
+                int count2 = cursor2.getCount();
+                int random2 = (int) (Math.random() * count2);
+                try { //db에서 옷을 가져옴
+                    Cursor sizeCursor = db2.rawQuery("SELECT length(img)  FROM clothesTBL WHERE season = 'fall' AND topBottoms='Bottoms' LIMIT " + random2 + ",1;", null);
+//                    Cursor sizeCursor = db2.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=6", null);
+                    if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+                        long blobStart = 1; //blob 시작
+                        long blobLen = 1; //blob 길이
+                        int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+                        byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+                        while (blobSize > 0) {
+                            blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+                            blobSize -= blobLen;
+
+                            Cursor blobCursor = db2.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE season = 'fall' AND topBottoms='Bottoms' LIMIT " + random2 + ",1;", null);
+//                            Cursor blobCursor = db2.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num=6", null);
+                            if (blobCursor.moveToNext()) {
+                                byte[] barr = blobCursor.getBlob(0);
+                                if (barr != null) {
+                                    System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+                                }
+                                blobStart += blobLen;
+                                blobCursor.close();
+                            }
+                        }
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        bottom_cloths.setImageBitmap(bitmap);
+                    }
+                    sizeCursor.close();
+                    db2.close();
+                } catch (Exception e) {
+
+                }
+            } else if (17 < tmp && tmp <= 23) {
+                //16도초과 22도이하일때 옷 선택하는 DB
+                //봄
+                SQLiteDatabase db = DBHelper.getReadableDatabase();
+                Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL WHERE season = 'spring' AND topBottoms='Top';", null);
+                int count = cursor.getCount();
+                int random = (int) (Math.random() * count);
+                Log.d("cccc",count+" count, "+random+" ran");
+
+                try { //db에서 옷을 가져옴
+
+                    DBHelper = new DBHelper(getContext());
+                    db = DBHelper.getReadableDatabase();
+
+                    Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE season = 'spring' AND topBottoms='Top' LIMIT " + random + ",1;", null);
+//                    Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=2;", null);
+
+                    if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+                        long blobStart = 1; //blob 시작
+                        long blobLen = 1; //blob 길이
+                        int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+                        byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+                        while (blobSize > 0) {
+                            blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+                            blobSize -= blobLen;
+
+                            Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ")  FROM clothesTBL WHERE season = 'spring' AND topBottoms='Top' LIMIT " + random + ",1;", null);
+//                            Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num=2", null);
+                            if (blobCursor.moveToNext()) {
+                                byte[] barr = blobCursor.getBlob(0);
+                                if (barr != null) {
+                                    System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+                                }
+                                blobStart += blobLen;
+                                blobCursor.close();
+                            }
+                        }
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        top_clothes.setImageBitmap(bitmap);
+                    }
+                    sizeCursor.close();
+                } catch (Exception e) {
+
+                }
+                SQLiteDatabase db2 = DBHelper.getReadableDatabase();
+                Cursor cursor2 = db2.rawQuery("SELECT img FROM clothesTBL WHERE season = 'spring' AND topBottoms='Bottoms';", null);
+                int count2 = cursor2.getCount();
+                int random2 = (int) (Math.random() * count2);
+                try { //db에서 옷을 가져옴
+                    Cursor sizeCursor = db2.rawQuery("SELECT length(img)  FROM clothesTBL WHERE season = 'spring' AND topBottoms='Bottoms' LIMIT " + random2 + ",1;", null);
+//                    Cursor sizeCursor = db2.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=6", null);
+                    if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+                        long blobStart = 1; //blob 시작
+                        long blobLen = 1; //blob 길이
+                        int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+                        byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+                        while (blobSize > 0) {
+                            blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+                            blobSize -= blobLen;
+
+                            Cursor blobCursor = db2.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE season = 'spring' AND topBottoms='Bottoms' LIMIT " + random2 + ",1;", null);
+//                            Cursor blobCursor = db2.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num=6", null);
+                            if (blobCursor.moveToNext()) {
+                                byte[] barr = blobCursor.getBlob(0);
+                                if (barr != null) {
+                                    System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+                                }
+                                blobStart += blobLen;
+                                blobCursor.close();
+                            }
+                        }
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        bottom_cloths.setImageBitmap(bitmap);
+                    }
+                    sizeCursor.close();
+                    db2.close();
+                } catch (Exception e) {
+
+                }
+            } else if (23 < tmp ) {
+                //123도초과 일때 옷 선택하는 DB
+                //여름
                 SQLiteDatabase db = DBHelper.getReadableDatabase();
                 Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL WHERE season = 'summer' AND topBottoms='Top';", null);
                 int count = cursor.getCount();
@@ -188,8 +403,8 @@ public class CoordiFragment extends Fragment implements View.OnClickListener {
                     }
                     sizeCursor.close();
                 } catch (Exception e) {
-                }
 
+                }
                 SQLiteDatabase db2 = DBHelper.getReadableDatabase();
                 Cursor cursor2 = db2.rawQuery("SELECT img FROM clothesTBL WHERE season = 'summer' AND topBottoms='Bottoms';", null);
                 int count2 = cursor2.getCount();
@@ -223,10 +438,96 @@ public class CoordiFragment extends Fragment implements View.OnClickListener {
                     sizeCursor.close();
                     db2.close();
                 } catch (Exception e) {
-                }
 
-            } else if (tmp >= 27) {
-                //27도 이상일때 옷 선택하는 DB
+                }
+//            } else if (16 < tmp && tmp <= 19) {
+//                //16도초과 19도이하일때 옷 선택하는 DB
+
+//            } else if (19 < tmp && tmp <= 20) {
+//                //19도초과 22도이하일때 옷 선택하는 DB
+
+//            } else if (16 < tmp && tmp < 27) {
+//                //22도초과 27도미만일때 옷 선택하는 DB
+//                //Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL WHERE season = summer IN (SELECT * From summer WHERE topBottoms = top);", null);
+//                //Cursor cursor2 = db.rawQuery("SELECT * FROM clothesTBL WHERE season = summer IN (SELECT * From summer WHERE topBottoms = Bottoms);", null);
+//                SQLiteDatabase db = DBHelper.getReadableDatabase();
+//                Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL WHERE season = 'summer' AND topBottoms='Top';", null);
+//                int count = cursor.getCount();
+//                int random = (int) (Math.random() * count);
+//                Log.d("cccc",count+" count, "+random+" ran");
+//
+//                try { //db에서 옷을 가져옴
+//
+//                    DBHelper = new DBHelper(getContext());
+//                    db = DBHelper.getReadableDatabase();
+//
+//                    Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE season = 'summer' AND topBottoms='Top' LIMIT " + random + ",1;", null);
+////                    Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=2;", null);
+//
+//                    if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+//                        long blobStart = 1; //blob 시작
+//                        long blobLen = 1; //blob 길이
+//                        int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+//                        byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+//                        while (blobSize > 0) {
+//                            blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+//                            blobSize -= blobLen;
+//
+//                            Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ")  FROM clothesTBL WHERE season = 'summer' AND topBottoms='Top' LIMIT " + random + ",1;", null);
+////                            Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num=2", null);
+//                            if (blobCursor.moveToNext()) {
+//                                byte[] barr = blobCursor.getBlob(0);
+//                                if (barr != null) {
+//                                    System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+//                                }
+//                                blobStart += blobLen;
+//                                blobCursor.close();
+//                            }
+//                        }
+//                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//                        top_clothes.setImageBitmap(bitmap);
+//                    }
+//                    sizeCursor.close();
+//                } catch (Exception e) {
+//                }
+//
+//                SQLiteDatabase db2 = DBHelper.getReadableDatabase();
+//                Cursor cursor2 = db2.rawQuery("SELECT img FROM clothesTBL WHERE season = 'summer' AND topBottoms='Bottoms';", null);
+//                int count2 = cursor2.getCount();
+//                int random2 = (int) (Math.random() * count2);
+//                try { //db에서 옷을 가져옴
+//                    Cursor sizeCursor = db2.rawQuery("SELECT length(img)  FROM clothesTBL WHERE season = 'summer' AND topBottoms='Bottoms' LIMIT " + random2 + ",1;", null);
+////                    Cursor sizeCursor = db2.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=6", null);
+//                    if (sizeCursor.moveToNext()) { //byte -> Bitmap 변환. cursor로 db에 저장되어있는 bitmap을 한번에 불러올 수 없기 때문에 나눠서 불러와 다른 변수에 저장하는 식으로 해야 함
+//                        long blobStart = 1; //blob 시작
+//                        long blobLen = 1; //blob 길이
+//                        int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+//                        byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+//                        while (blobSize > 0) {
+//                            blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+//                            blobSize -= blobLen;
+//
+//                            Cursor blobCursor = db2.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE season = 'summer' AND topBottoms='Bottoms' LIMIT " + random2 + ",1;", null);
+////                            Cursor blobCursor = db2.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num=6", null);
+//                            if (blobCursor.moveToNext()) {
+//                                byte[] barr = blobCursor.getBlob(0);
+//                                if (barr != null) {
+//                                    System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+//                                }
+//                                blobStart += blobLen;
+//                                blobCursor.close();
+//                            }
+//                        }
+//                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//                        bottom_cloths.setImageBitmap(bitmap);
+//                    }
+//                    sizeCursor.close();
+//                    db2.close();
+//                } catch (Exception e) {
+//                }
+//
+//            } else if (tmp >= 27) {
+//                //27도 이상일때 옷 선택하는 DB
             }
     }
 
