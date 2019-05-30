@@ -1,15 +1,18 @@
 package com.pickth.dddd.smartcoordination.cloth;
 
+import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pickth.dddd.smartcoordination.DBHelper;
 import com.pickth.dddd.smartcoordination.R;
@@ -64,7 +67,6 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     class ClothesViewHolder extends RecyclerView.ViewHolder {
         ClothesDataManager manager;
         ImageView ivCloth = itemView.findViewById(R.id.iv_cloth_thumbnail);
-        TextView tvSeason = itemView.findViewById(R.id.tv_cloth_thumbnail);
 
         ClothesViewHolder(View view) {
             super(view);
@@ -79,7 +81,6 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 byte[] bytes = items.get(position).getByte();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 ivCloth.setImageBitmap(bitmap);
-                tvSeason.setText(items.get(position).getmSeason());
             }catch (Exception e){}
 
             // 아이템을 눌렀을 때 클릭리스너.
@@ -87,21 +88,42 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 @Override
                 public void onClick(View view) {
                     listener.onClick(items);
+                    Activity act = (Activity)itemView.getContext();
+                    LayoutInflater inflater = act.getLayoutInflater();
+                    View layout = inflater.inflate(R.layout.toast_heart, (ViewGroup)itemView.findViewById(R.id.toast_heart));
+
                     PrettyDialog pDialog = new PrettyDialog(itemView.getContext());
                     pDialog
 //                  .setTitle("PrettyDialog Title")
 //                  .setMessage("PrettyDialog Message")
                     .setIcon(R.drawable.pdlg_icon_success)
                     .setIconTint(R.color.colorPurple1)
+                    .setIconCallback(new PrettyDialogCallback() {
+                        @Override
+                        public void onClick() {
+                            Toast toast = new Toast(itemView.getContext());
+                            DisplayMetrics display = itemView.getContext().getResources().getDisplayMetrics();
+                            int xOffset = (int) (Math.random() * display.widthPixels);
+                            int yOffset = (int) (Math.random() * display.heightPixels);
+                            toast.setGravity(Gravity.TOP | Gravity.LEFT, xOffset, yOffset);
+                            toast.setDuration(Toast.LENGTH_SHORT);
+                            toast.setView(layout);
+                            toast.show();
+                        }
+                    })
                     .addButton(
-                            "Edit",     // button text
+                            "Information",     // button text
                             R.color.pdlg_color_white,  // button text color
                             R.color.colorPurple2,  // button background color
                             new PrettyDialogCallback() {  // button OnClick listener
                                 @Override
                                 public void onClick() {
-                                    // Do what you gotta do
+                                    // 커스텀 다이얼로그를 생성한다. 사용자가 만든 클래스이다.
+                                    ClothesInfoDialog customDialog = new ClothesInfoDialog(itemView.getContext(), manager.getItem(position));
 
+                                    // 커스텀 다이얼로그를 호출한다.
+                                    // 커스텀 다이얼로그의 결과를 출력할 TextView를 매개변수로 같이 넘겨준다.
+                                    customDialog.callFunction();
                                     pDialog.dismiss();
                                 }
                             }

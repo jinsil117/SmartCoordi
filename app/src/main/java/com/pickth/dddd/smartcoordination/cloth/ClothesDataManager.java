@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
 import com.pickth.dddd.smartcoordination.DBHelper;
 
@@ -34,7 +33,6 @@ public class ClothesDataManager {  //저장
         for (int i=0; i<cursor.getCount(); i++){
             cursor.moveToNext();
             int num = cursor.getInt(0);
-            Log.d("sqlll", "num " + num + ", i" + i +", cursor " + cursor.getCount() + mContext);
             try { //db에서 옷을 가져옴
                 db2 = DBHelper.getReadableDatabase();
                 Cursor sizeCursor = db2.rawQuery("SELECT length(img) FROM clothesTBL WHERE num=" + num, null);
@@ -68,7 +66,6 @@ public class ClothesDataManager {  //저장
         }
         cursor.close();
         db.close();
-        Log.d("sqlll", "mItems.size() " + mItems.size());
         return mItems;
     }
 
@@ -120,7 +117,27 @@ public class ClothesDataManager {  //저장
         //이미지를 db에서 삭제
         SQLiteStatement p = db.compileStatement("DELETE FROM clothesTBL WHERE num = " + num);
         p.execute();
+        cursor.close();
         db.close();
         notifyDataSetChanged();
+    }
+
+    /**
+     * 선택한 아이템을 가져오는 메소드
+     * @param position
+     */
+    public ClothesItem getItem(int position) {
+        ClothesItem item = new ClothesItem();
+        db = DBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM clothesTBL LIMIT " + position +",1;", null);
+        cursor.moveToNext();
+        int num = cursor.getInt(0);
+        item.setmTopBottoms(cursor.getString(1));
+        item.setmLength(cursor.getString(2));
+        item.setmSeason(cursor.getString(3));
+        item.setmColor(cursor.getString(4));
+        cursor.close();
+        db.close();
+        return item;
     }
 }
