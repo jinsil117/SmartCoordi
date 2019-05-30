@@ -8,9 +8,13 @@ import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -25,16 +29,24 @@ import android.widget.TextView;
 import com.pickth.dddd.smartcoordination.ChangeImage;
 import com.pickth.dddd.smartcoordination.DBHelper;
 import com.pickth.dddd.smartcoordination.R;
+import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
 public class HistoryFragment_dev extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
 
+    private static final int PICK_FROM_CAMERA = 2;
+    private Uri photoUri;
+    private String imageFilePath;
     private TextView tv;
     private Button beforeBTN, afterBTN;
     private GridView gv;
@@ -205,7 +217,7 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
                 public void onClick(DialogInterface dialog, int pos) {
                     String selectedText = items[pos].toString();
                     if (selectedText.equals("사진촬영")) {
-
+                        doTakePhotoAction();
                     } else if (selectedText.equals("갤러리")) {
                         try {
                             // 갤러리로 이동
@@ -275,6 +287,13 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
                     e.printStackTrace();
                 }
             }
+
+            if(resultCode==PICK_FROM_CAMERA){
+                Intent intent = new Intent(getContext(), ClothAddActivity.class);
+                intent.putExtra("imageUri", photoUri);
+                intent.putExtra("imageFilePath", imageFilePath);
+                startActivity(intent);
+            }
         }
 
     }
@@ -285,5 +304,33 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
         gv.setAdapter(adapter);
     }
 
+    private void doTakePhotoAction() { //카메라 촬영 후 이미지 가져오는 함수
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+            // Error occurred while creating the File
+        }
+
+        if (photoFile != null) {
+            photoUri = FileProvider.getUriForFile(getContext(), getContext().getPackageName(), photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+            startActivityForResult(takePictureIntent, PICK_FROM_CAMERA);
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "TEST_" + timeStamp + "_";
+        File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,      /* prefix */
+                ".png",         /* suffix */
+                storageDir          /* directory */
+        );
+        imageFilePath = image.getAbsolutePath();
+        return image;
+    }
 
 }
