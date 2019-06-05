@@ -321,8 +321,7 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
                     db.close();
                     in.close();
 
-                    Bitmap bit = rotateImage(bm,90);
-                    selectedDay.img.setImageBitmap(bit);
+                    selectedDay.img.setImageBitmap(bm);
 
                 } catch (Exception e) {
                     e.printStackTrace();
