@@ -1,17 +1,13 @@
 package com.pickth.dddd.smartcoordination;
 
-import android.content.Context;
-import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v4.app.Fragment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import android.net.Uri;
 
 public class ChangeImage extends AppCompatActivity {
 //
@@ -53,6 +49,15 @@ public class ChangeImage extends AppCompatActivity {
 
     public static Bitmap getBitmap(byte[] image) { //byte형식을 bitmap으로 변환
         Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+        return bitmap;
+    }
+
+    public static Bitmap getBitmap(Activity activity, Uri uri){
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
+
+        }catch (Exception e){}
         return bitmap;
     }
 }

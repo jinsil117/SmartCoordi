@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".add.ClothAddActivity"/>
-
+        <activity android:name=".history.CameraIntent"/>
     </application>
 
 </manifest>

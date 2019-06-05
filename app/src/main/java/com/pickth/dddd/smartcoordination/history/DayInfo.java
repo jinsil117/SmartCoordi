@@ -6,6 +6,8 @@ import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
+import java.io.Serializable;
+
 public class DayInfo {
     String day; //날짜
     Bitmap bm;

@@ -1,6 +1,5 @@
 package com.pickth.dddd.smartcoordination.history;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,7 +14,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +27,6 @@ import android.widget.TextView;
 import com.pickth.dddd.smartcoordination.ChangeImage;
 import com.pickth.dddd.smartcoordination.DBHelper;
 import com.pickth.dddd.smartcoordination.R;
-import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +35,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+
+import libs.mjn.prettydialog.PrettyDialog;
+import libs.mjn.prettydialog.PrettyDialogCallback;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -205,62 +204,103 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
         if (Day.equals("")) { //만약 공백인 날짜를 선택하면
             //아무것도 뜨지 않음
         } else {
-            final List<String> ListItems = new ArrayList<>(); //날짜 선택시 뜨는 팝업창의 메뉴 리스트들
-            ListItems.add("사진촬영");
-            ListItems.add("갤러리");
-            ListItems.add("사진삭제");
-            final CharSequence[] items = ListItems.toArray(new String[ListItems.size()]);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(Year + "년 " + (Month + 1) + "월 " + Day + "일");
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int pos) {
-                    String selectedText = items[pos].toString();
-                    if (selectedText.equals("사진촬영")) {
-                        doTakePhotoAction();
-                    } else if (selectedText.equals("갤러리")) {
-                        try {
-                            // 갤러리로 이동
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            startActivityForResult(intent, 1);
-                            bm = null;
-                        } catch (Exception e) {
-
+            PrettyDialog pDialog = new PrettyDialog(gv.getContext());
+            pDialog
+                    .setTitle(Year + "년 " + (Month + 1) + "월 " + Day + "일")
+                    .setIcon(R.drawable.pdlg_icon_success)
+                    .setIconTint(R.color.colorPurple1)
+                    .setIconCallback(new PrettyDialogCallback() {
+                        @Override
+                        public void onClick() {
+                            pDialog.dismiss();
                         }
-                    } else { //사진삭제
-                        int key = dayInfo.getHistoryNum();
-                        db = DBHelper.getWritableDatabase();
-                        db.execSQL("DELETE FROM historyTBL WHERE num = " + key);
-                        db.close();
+                    })
+                    .addButton(
+                            "camera",     // button text
+                            R.color.pdlg_color_white,  // button text color
+                            R.color.colorPurple2,  // button background color
+                            new PrettyDialogCallback() {  // button OnClick listener
+                                @Override
+                                public void onClick() {
+                                    doTakePhotoAction();
+                                    pDialog.dismiss();
+                                }
+                            }
+                    )
+                    .addButton(
+                            "album",
+                            R.color.pdlg_color_white,
+                            R.color.colorPurple3,
+                            new PrettyDialogCallback() {
+                                @Override
+                                public void onClick() {
+                                    Intent intent = new Intent();
+                                    intent.setType("image/*");
+                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                                    startActivityForResult(intent, 1);
+                                    bm = null;
+                                    pDialog.dismiss();
+                                }
+                            }
+                    )
+                    .addButton(
+                            "delete",
+                            R.color.pdlg_color_black,
+                            R.color.pdlg_color_gray,
+                            new PrettyDialogCallback() {
+                                @Override
+                                public void onClick() {
+                                    int key = dayInfo.getHistoryNum();
+                                    db = DBHelper.getWritableDatabase();
+                                    db.execSQL("DELETE FROM historyTBL WHERE num = " + key);
+                                    db.close();
 
-                        selectedDay.img.setImageBitmap(null);
-                    }
-                }
-            });
-            builder.show();
+                                    selectedDay.img.setImageBitmap(null);
+                                    pDialog.dismiss();
+                                }
+                            }
+                    )
+                    .show();
         }
-    }
+        }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == 1) { //갤러리에서 선택한 이미지 db에 저장하기
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+
+        String historyNum1 = ""+Year+""+Month+""+Day;
+        savePk = Integer.parseInt(historyNum1);
+
+        switch (requestCode) {
+            case PICK_FROM_CAMERA: {
+                Bitmap bitmap = changeImage.getBitmap(this.getActivity(),photoUri);
+                byte[] bytes1 = changeImage.getBytes(bitmap);
+
+                selectedDay.setBm(bitmap);
+
+                Intent intent = new Intent(getContext(),CameraIntent.class);
+                intent.putExtra("imageUri", photoUri);
+                intent.putExtra("imageFilePath", imageFilePath);
+                intent.putExtra("pk",savePk);
+                intent.putExtra("year",String.valueOf(Year));
+                intent.putExtra("month",String.valueOf(Month));
+                intent.putExtra("day",String.valueOf(Day));
+                startActivity(intent);
+
+                Bitmap bit = rotateImage(bitmap,90);
+                selectedDay.img.setImageBitmap(bit);
+                break;
+            }
+            case 1: {
                 try {
                     db = DBHelper.getWritableDatabase();
-                    String historyNum1 = ""+Year+""+Month+""+Day;
-                    savePk = Integer.parseInt(historyNum1);
+
                     InputStream in = getActivity().getContentResolver().openInputStream(data.getData()); //이미지를 불러온다
 
-                    Matrix rotateMatrix = new Matrix();
-                    rotateMatrix.postRotate(90);
-
                     bm = BitmapFactory.decodeStream(in); //이미지를 Bitmap 변수에 저장
-                    Bitmap rotateBitmap = Bitmap.createBitmap(bm,0,0,bm.getWidth(),bm.getHeight(),rotateMatrix,false);
-                    byte[] bytes = changeImage.getBytes(rotateBitmap); //Bitmap 형식을 byte형식으로 변환 및 저장
+                    byte[] bytes = changeImage.getBytes(bm); //Bitmap 형식을 byte형식으로 변환 및 저장
 
                     Cursor checkCursor = db.rawQuery("SELECT img FROM historyTBL WHERE num ="+savePk,null);
                     if (checkCursor.moveToNext()){ //해당 날짜에 이미 사진이 존재
@@ -281,18 +321,13 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
                     db.close();
                     in.close();
 
-                    selectedDay.img.setImageBitmap(rotateBitmap);
+                    Bitmap bit = rotateImage(bm,90);
+                    selectedDay.img.setImageBitmap(bit);
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-
-            if(resultCode==PICK_FROM_CAMERA){
-                Intent intent = new Intent(getContext(), ClothAddActivity.class);
-                intent.putExtra("imageUri", photoUri);
-                intent.putExtra("imageFilePath", imageFilePath);
-                startActivity(intent);
+                break;
             }
         }
 
@@ -331,6 +366,12 @@ public class HistoryFragment_dev extends Fragment implements View.OnClickListene
         );
         imageFilePath = image.getAbsolutePath();
         return image;
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle){
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source,0,0,source.getWidth(),source.getHeight(),matrix,true);
     }
 
 }

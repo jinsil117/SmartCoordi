@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,7 +109,8 @@ public class CalendarAdapter extends BaseAdapter
         }
 
         if(day.getBm() != null) {
-            dayViewHolder.img.setImageBitmap(bm);
+            Bitmap bit = rotateImage(bm,90);
+            dayViewHolder.img.setImageBitmap(bit);
         }
 
         if(day != null)
@@ -165,4 +167,9 @@ public class CalendarAdapter extends BaseAdapter
         return cellHeight;
     }
 
+    public static Bitmap rotateImage(Bitmap source, float angle){
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source,0,0,source.getWidth(),source.getHeight(),matrix,true);
+    }
 }
