@@ -31,7 +31,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class ClothesFragment extends Fragment implements View.OnClickListener{
 
-    RecyclerView rvClothes;
+    static RecyclerView rvClothes;
     ClothesAdapter mAdapter;
     ClothesDataManager manager;
     ArrayList<ClothesItem> items = new ArrayList<>();

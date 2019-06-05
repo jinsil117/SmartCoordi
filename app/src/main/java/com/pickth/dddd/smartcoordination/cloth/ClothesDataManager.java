@@ -9,13 +9,14 @@ import com.pickth.dddd.smartcoordination.DBHelper;
 
 import java.util.ArrayList;
 
-public class ClothesDataManager {  //저장
+import static com.pickth.dddd.smartcoordination.cloth.ClothesFragment.rvClothes;
+
+public class ClothesDataManager {  //DB
     private Context mContext;
     private ArrayList<ClothesItem> mItems;
 
     DBHelper DBHelper;
     SQLiteDatabase db, db2, db3;
-    ClothesItem ci;
 
     public ClothesDataManager(Context context) {
         mContext = context.getApplicationContext();
@@ -74,13 +75,15 @@ public class ClothesDataManager {  //저장
      * mItems에 아이템을 추가하거나 삭제했을 때 호출한다.
      */
     public void notifyDataSetChanged() {
-//        mContext.
         ArrayList<ClothesItem> items = getClothesItems();
         ClothesAdapter adapter = new ClothesAdapter();
         //adapter에 item 추가하기
         for(ClothesItem item: items)
             adapter.addItem(item);
         adapter.notifyDataSetChanged();
+        // recycler view 설정
+        rvClothes.setAdapter(adapter);
+//        rvClothes.setLayoutManager(new GridLayoutManager(mContext, 3));
     }
 
     /**
