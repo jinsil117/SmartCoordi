@@ -3,16 +3,20 @@ package com.pickth.dddd.smartcoordination.lookbook;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -47,6 +51,11 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
         dbHelper = new DBHelper(context);
     }
 
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     public void callFunction(){
         // 커스텀 다이얼로그를 정의하기위해 Dialog클래스를 생성한다.
         final Dialog dlg = new Dialog(context);
@@ -56,6 +65,24 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
 
         // 커스텀 다이얼로그의 레이아웃을 설정한다.
         dlg.setContentView(R.layout.fragment_lookbook_data);
+
+//        Display display = getWindowManager().getDefaultDisplay();
+//        Point size = new Point();
+//        display.getSize(size);
+//
+//        Window window = dlg.getWindow();
+//        int x = (int)(size.x * 0.7f);
+//        int y = (int)(size.y * 0.8f);
+
+        //window.setLayout(x,y);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dlg.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        Window window = dlg.getWindow();
+        window.setAttributes(lp);
+
+
 
         // 커스텀 다이얼로그를 노출한다.
         dlg.show();
@@ -67,6 +94,9 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
         checkBox = (CheckBox) dlg.findViewById(R.id.cb);
         final Button choose = (Button) dlg.findViewById(R.id.choose);
         final Button cancel = (Button) dlg.findViewById(R.id.cancel);
+
+        initdatas();
+
 
 //        top.setOnClickListener(this);
 //        bt.setOnClickListener(this);
@@ -101,9 +131,8 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
             public void onClick(View view) {
 
                 state =2;
-               saveBottom();
+                saveBottom();
                 initLookbookAdapter();
-
             }
         });
 
@@ -135,6 +164,7 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         dataItem dataItem1 = DI.get(position);
+
         dataItem1.setChecked(true);
         checkBox.setChecked(true);
     }
@@ -225,9 +255,52 @@ public class ChooseData extends AppCompatActivity implements AdapterView.OnItemC
         db.close();
     }
 
-    private void initLookbookAdapter() {
+    protected void initLookbookAdapter() {
         adapter = new DataAdapter(context, R.layout.fragment_lookbook_data_info,DI);
         gv.setAdapter(adapter);
+    }
+
+    public void initdatas() {
+        try {
+            db = dbHelper.getReadableDatabase();
+            DI = new ArrayList<>();
+            Cursor cursor = db.rawQuery("SELECT num FROM clothesTBL;", null);
+
+            while (cursor.moveToNext()) {
+                int num = cursor.getInt(0);
+
+                Cursor sizeCursor = db.rawQuery("SELECT length(img) FROM clothesTBL WHERE num = " + num, null);
+                if (sizeCursor.moveToNext()) {
+                    long blobStart = 1; //blob 시작
+                    long blobLen = 1; //blob 길이
+                    int blobSize = sizeCursor.getInt(0); //이미지의 blob 사이즈
+                    byte[] bytes = blobSize > 0 ? new byte[(int) blobSize] : null; //blob 사이즈의 배열 생성
+
+                    while (blobSize > 0) {
+                        blobLen = blobSize > 1000000 ? 1000000 : blobSize; //1000000는 cursor 용량 한계치
+                        blobSize -= blobLen;
+
+                        Cursor blobCursor = db.rawQuery("SELECT substr(img," + blobStart + "," + blobLen + ") FROM clothesTBL WHERE num = " + num, null);
+                        if (blobCursor.moveToNext()) {
+                            byte[] barr = blobCursor.getBlob(0);
+                            if (barr != null) {
+                                System.arraycopy(barr, 0, bytes, (int) blobStart - 1, barr.length);
+                            }
+                            blobCursor.close();
+
+                            blobStart += blobLen;
+                        }
+
+                    }
+                    Bitmap bm = changeImage.getBitmap(bytes);
+                    dataItem = new dataItem(num, bm);
+                    DI.add(dataItem);
+                }
+                sizeCursor.close();
+            }
+            cursor.close();
+            initLookbookAdapter();
+        }catch (Exception e){}
     }
 
 

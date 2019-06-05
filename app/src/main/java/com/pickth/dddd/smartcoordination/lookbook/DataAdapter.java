@@ -13,6 +13,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.pickth.dddd.smartcoordination.ChangeImage;
 import com.pickth.dddd.smartcoordination.DBHelper;
 import com.pickth.dddd.smartcoordination.R;
 import com.pickth.dddd.smartcoordination.history.CalendarAdapter;
@@ -29,6 +31,7 @@ public class DataAdapter extends BaseAdapter {
     private LayoutInflater mLiInflater;
     ArrayList<dataItem> DI;
     int num=0;
+    ChangeImage changeImage;
 
     public DataAdapter(Context context,int textResource, ArrayList<dataItem> DI)
     {
@@ -115,5 +118,6 @@ public class DataAdapter extends BaseAdapter {
 //
 //        return cellHeight;
 //}
+
 
 }
