@@ -12,19 +12,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+
 import com.pickth.dddd.smartcoordination.R;
 import com.pickth.dddd.smartcoordination.add.ClothAddActivity;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
 import static android.app.Activity.RESULT_OK;
 
 public class ClothesFragment extends Fragment implements View.OnClickListener{
@@ -51,7 +53,7 @@ public class ClothesFragment extends Fragment implements View.OnClickListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_clothes_he,container,false);
+        View view = inflater.inflate(R.layout.fragment_clothes,container,false);
 
         fab_open =  AnimationUtils.loadAnimation(getContext(),R.anim.fab_open); //+버튼 클릭 시 갤러리 접근 fab과 카메라 접근 fab이 보여짐
         fab_close = AnimationUtils.loadAnimation(getContext(), R.anim.fab_close); // 갤러리 접근 fab과 카메라 접근 fab이 안보여짐
