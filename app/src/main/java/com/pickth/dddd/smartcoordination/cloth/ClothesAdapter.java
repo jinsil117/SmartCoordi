@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,7 +74,6 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void onBind(final ClothesClickListener listener, int position) {
-            DBHelper = new DBHelper(itemView.getContext());
             // 아이템들, 데이터 매니저 초기화
             manager = new ClothesDataManager(itemView.getContext());
             items = manager.getClothesItems();
@@ -87,6 +87,10 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    // 아이템들, 데이터 매니저 초기화
+                    manager = new ClothesDataManager(itemView.getContext());
+                    items = manager.getClothesItems();
+                    Log.e("ccccc", "click");
                     listener.onClick(items);
                     Activity act = (Activity)itemView.getContext();
                     LayoutInflater inflater = act.getLayoutInflater();
@@ -98,7 +102,7 @@ public class ClothesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 //                  .setMessage("PrettyDialog Message")
                     .setIcon(R.drawable.pdlg_icon_success)
                     .setIconTint(R.color.colorPurple1)
-                    .setIconCallback(new PrettyDialogCallback() {
+                    .setIconCallback(new PrettyDialogCallback() {   //icon을 클릭했을때 하트가 화면의 랜덤한 위치에 나타난다.
                         @Override
                         public void onClick() {
                             Toast toast = new Toast(itemView.getContext());
